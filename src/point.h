@@ -51,7 +51,7 @@ int point_y(Point* point);
  * @param n the array size.
  * @return the point array.
  */
-Point* point_array(int n);
+Point** point_array(int n);
 
 /**
  * Computes the distance between two points.
@@ -59,3 +59,10 @@ Point* point_array(int n);
  * @param p2 the second point.
  */
 long double point_distance(Point* p1, Point* p2);
+                                
+/**
+ * Copies the given point.
+ * @param point the point.
+ * @return the copied point.
+ */
+Point* point_copy(Point* point);

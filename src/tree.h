@@ -22,8 +22,9 @@
 /**
  * Creates a new Tree.
  * @param points the points.
+ * @param k the size.
  */
-Tree* tree_new(Point* points);
+Tree* tree_new(Point** points, int k);
 
 /**
  * Frees the memory used by the tree.

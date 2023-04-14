@@ -24,11 +24,12 @@
  * @param points a two dimensional point array.
  * @param k the size of the tree.
  * @param n the number of points in the graph.
+ * @param seedval the seed.
  */
-KMST* kmst_new(Point* points, int k, int n);
+kMST* kmst_new(Point* points, int k, int n, long int seedval);
 
 /**
  * Frees the memory used by the k-minimum spanning tree problem instance.
  * @param kmst the problem instance to be freed.
  */
-void kmst_free(KMST* kmst);
+void kmst_free(kMST* kmst);

@@ -19,6 +19,7 @@
 
 #include "heuristic.h"
 
+#include <stdlib.h>
 #include <math.h>
 
 /* The point structure. */
@@ -36,6 +37,8 @@ Point* point_new(int x, int y) {
   /* Value copy. */
   point->x = x;
   point->y = y;
+
+  return point;
 }
 
 /* Frees the memory used by the Point. */
@@ -54,11 +57,22 @@ int point_y(Point* point) {
 }
 
 /* Creates a point array. */
-Point* point_array(int n) {
-  Point* points = calloc(1, sizeof(struct _Point)*n);
+Point** point_array(int n) {
+  return calloc(1, n*sizeof(Point*));
 }
 
 /* Computes the distance between two points. */
 long double point_distance(Point* p1, Point* p2) {
   return sqrt(pow(fabs(p1->x - p2->x), 2) + pow(fabs(p1->y - p2->y), 2));
+}
+
+/* Copies the given point. */
+Point* point_copy(Point* point) {
+  /* Heap allocation. */
+  Point* p = malloc(sizeof(struct _Point));
+  /* Value copy. */
+  p->x = point->x;
+  p->y = point->y;
+
+  return p;
 }

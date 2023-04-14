@@ -19,6 +19,8 @@
 
 #include "heuristic.h"
 
+#include <stdlib.h>
+
 /* The AIG structure. */
 struct _AIG {
   /* The k-minimum spanning tree problem. */
@@ -42,16 +44,18 @@ AIG* aig_new(kMST* kmst, long double a_max, long double b_max,
   AIG* aig = malloc(sizeof(struct _AIG));
 
   /* Value copy. */
-  aig->ksmt    = kmst;
+  aig->kmst    = kmst;
   aig->a_max   = a_max;
   aig->b_max   = b_max;
   aig->epsilon = epsilon;
   aig->delta   = delta;
+
+  return aig;
 }
 
 /* Frees the memory used by the Algorithm of the Innovative Gunner. */
 void aig_free(AIG* aig) {
-  if (aig->ksmt)
-    kmst_free(aig->ksmt);
+  if (aig->kmst)
+    kmst_free(aig->kmst);
   free(aig);
 }

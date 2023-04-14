@@ -15,7 +15,8 @@ src = [
   'src/input_parser.c',
   'src/kmst.c',
   'src/point.c',
-  'src/tree.c'
+  'src/tree.c',
+  'src/aig.c'
 ]
 
 includes = include_directories('src/')

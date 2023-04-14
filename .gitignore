@@ -50,3 +50,22 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# projectile file
+.projectile
+
+# build generated directory
+/build
+
+# ggtags
+/src/GPATH
+/src/GRTAGS
+/src/GTAGS
+
+# tex generated files
+/report/report.aux
+/report/report.log
+/report/report.toc
+/report/report.bbl
+/report/report.blg
+/report/texput.log
