@@ -21,5 +21,12 @@
 
 /**
  * Creates a new Tree.
+ * @param points the points.
  */
-Tree* tree_new();
+Tree* tree_new(Point* points);
+
+/**
+ * Frees the memory used by the tree.
+ * @param tree the tree.
+ */
+void tree_free(Tree* tree);
