@@ -19,8 +19,6 @@
 
 #include "heuristic.h"
 
-#include <stdlib.h>
-
 /* The kMST structure. */
 struct _kMST {
   /* The solution. */
@@ -38,10 +36,10 @@ struct _kMST {
 };
 
 /* Selects the initial solution. */
-static Point* initial_solution(kMST*, int);
+static Point** initial_solution(kMST*, int);
 
 /* Creates a new k-minimum spanning tree problem instance. */
-kMST* kmst_new(Point* points, int k, int n, long int seedval) {
+kMST* kmst_new(Point** points, int k, int n, long int seedval) {
   /* Heap allocation. */
   kMST* kmst = malloc(sizeof(struct _kMST));
 
@@ -51,8 +49,9 @@ kMST* kmst_new(Point* points, int k, int n, long int seedval) {
   kmst->n      = n;
 
   /* RNG. */
+  kmst->buffer = malloc(sizeof(struct drand48_data));
   srand48_r(seedval, kmst->buffer);
-  Point* initial = initial_solution(kmst, k);
+  Point** initial = initial_solution(kmst, k);
   kmst->tree = tree_new(initial, k);
   free(initial);
 
@@ -63,11 +62,29 @@ kMST* kmst_new(Point* points, int k, int n, long int seedval) {
 void kmst_free(kMST* kmst) {
   if (kmst->tree)
     tree_free(kmst->tree);
+  if (kmst->buffer)
+    free(kmst->buffer);
   free(kmst);
 }
 
+
+/* Returns the tree of the problem. */
+Tree* kmst_tree(kMST* kmst) {
+  return kmst->tree;
+}
+
+/* Returns the points of the problem. */
+Point** kmst_points(kMST* kmst) {
+  return kmst->points;
+}
+
+/* Returns the RNG buffer of the problem. */
+struct drand48_data* kmst_buffer(kMST* kmst) {
+  return kmst->buffer;
+}
+
 /* Selects the initial solution. */
-static Point* initial_solution(kMST* kmst, int k) {
+static Point** initial_solution(kMST* kmst, int k) {
   int i;
   long int* result = calloc(1, sizeof(long int));
   Point** points = point_array(k);

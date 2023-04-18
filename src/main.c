@@ -31,5 +31,6 @@ static void usage() {
 
 /* Executes the main thread of the program. */
 int main(int argc, char** argv) {
+  usage();
   return 0;
 }

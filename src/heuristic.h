@@ -44,8 +44,14 @@ typedef struct _kMST kMST;
  */
 typedef struct _Tree Tree;
 
+/**
+ * The Circle opaque structure.
+ */
+typedef struct _Circle Circle;
+
 #include "point.h"
 #include "input_parser.h"
 #include "tree.h"
 #include "kmst.h"
 #include "aig.h"
+#include "circle.h"

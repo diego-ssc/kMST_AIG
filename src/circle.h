@@ -1,5 +1,5 @@
 /*
- * This file is part of TSP_SA.
+ * This file is part of kMST_AIG.
  *
  * Copyright © 2023 Diego Sebastián Sánchez Correa
  *
@@ -20,23 +20,16 @@
 #pragma once
 
 #include <stdlib.h>
-#include <stdio.h>
 
 /**
- * Creates a new Input Parser.
- * @param fn the file name.
+ * Creates a new Circle
+ * @param radius the radius.
+ * @param center the middle point.
  */
-Input_parser* input_parser_new(char* fn);
+Circle* circle_new(double radius, Point* center);
 
 /**
- * Frees the memory used by the Input parser.
- * @poram parser the input parser.
+ * Frees the memory used by the Circle.
+ * @param circle.
  */
-void input_parser_free(Input_parser* parser);
-
-/**
- * Parses the file and returns the array of points.
- * @param porser the input parser.
- * @return the pointa array.
- */
-Point** parse(Input_parser* parser);
+void circle_free(Circle* circle);

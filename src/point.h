@@ -24,7 +24,7 @@
  * @param x the x coordinate.
  * @param y the y coordinate.
  */
-Point* point_new(int x, int y);
+Point* point_new(double x, double y);
 
 /**
  * Frees the memory used by the Point.
@@ -37,14 +37,14 @@ void point_free(Point* point);
  * @param point the point.
  * @return the x coordinate.
  */
-int point_x(Point* point);
+double point_x(Point* point);
 
 /**
  * Returns the y coordinate of the point.
  * @param point the point.
  * @return the y coordinate.
  */
-int point_y(Point* point);
+double point_y(Point* point);
 
 /**
  * Creates a point array.
@@ -52,6 +52,13 @@ int point_y(Point* point);
  * @return the point array.
  */
 Point** point_array(int n);
+
+/**
+ * Frees a point array.
+ * @param points the point array.
+ * @param n the number of elements of the array.
+ */
+void free_point_array(Point*** points, int n);
 
 /**
  * Computes the distance between two points.

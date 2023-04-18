@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <stdlib.h>
+
 /**
  * Creates a new k-minimum spanning tree problem instance.
  * @param points a two dimensional point array.
@@ -26,10 +28,31 @@
  * @param n the number of points in the graph.
  * @param seedval the seed.
  */
-kMST* kmst_new(Point* points, int k, int n, long int seedval);
+kMST* kmst_new(Point** points, int k, int n, long int seedval);
 
 /**
  * Frees the memory used by the k-minimum spanning tree problem instance.
  * @param kmst the problem instance to be freed.
  */
 void kmst_free(kMST* kmst);
+
+/**
+ * Returns the tree of the problem.
+ * @param kmst the problem instance.
+ * @return the tree.
+ */
+Tree* kmst_tree(kMST* kmst);
+
+/**
+ * Returns the points of the problem.
+ * @param kmst the problem instance.
+ * @return the point array.
+ */
+Point** kmst_points(kMST* kmst);
+
+/**
+ * Returns the RNG buffer of the problem.
+ * @param kmst the problem instance.
+ * @return the buffer.
+ */
+struct drand48_data* kmst_buffer(kMST* kmst);

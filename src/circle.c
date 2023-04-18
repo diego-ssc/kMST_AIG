@@ -1,5 +1,5 @@
 /*
- * This file is part of TSP_SA.
+ * This file is part of kMST_AIG.
  *
  * Copyright © 2023 Diego Sebastián Sánchez Correa
  *
@@ -17,26 +17,4 @@
  * this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
-#include <stdlib.h>
-#include <stdio.h>
-
-/**
- * Creates a new Input Parser.
- * @param fn the file name.
- */
-Input_parser* input_parser_new(char* fn);
-
-/**
- * Frees the memory used by the Input parser.
- * @poram parser the input parser.
- */
-void input_parser_free(Input_parser* parser);
-
-/**
- * Parses the file and returns the array of points.
- * @param porser the input parser.
- * @return the pointa array.
- */
-Point** parse(Input_parser* parser);
+#include "heuristic.h"

@@ -25,13 +25,13 @@
 /* The point structure. */
 struct _Point {
   /* The x coordinate. */
-  int x;
+  double x;
   /* The y coordinate. */
-  int y;
+  double y;
 };
 
 /* Creates a new Point. */
-Point* point_new(int x, int y) {
+Point* point_new(double x, double y) {
   /* Heap allocation. */
   Point* point = malloc(sizeof(struct _Point));
   /* Value copy. */
@@ -47,18 +47,27 @@ void point_free(Point* point) {
 }
 
 /* Returns the x coordinate of the point. */
-int point_x(Point* point) {
+double point_x(Point* point) {
   return point->x;
 }
 
 /* Returns the y coordinate of the point. */
-int point_y(Point* point) {
+double point_y(Point* point) {
   return point->y;
 }
 
 /* Creates a point array. */
 Point** point_array(int n) {
   return calloc(1, n*sizeof(Point*));
+}
+
+/* Frees a point array. */
+void free_point_array(Point*** points, int n) {
+  int a = n;
+  while (n--)
+    if (*((*points) + a-(n+1)))
+      point_free(*((*points) + a-(n+1)));
+  free(*points);
 }
 
 /* Computes the distance between two points. */

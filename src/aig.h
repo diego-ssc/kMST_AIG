@@ -25,10 +25,10 @@
  * @param a_max the first maximum angle.
  * @param b_max the first maximum angle.
  * @param epsilon the epsilon parameter.
- * @param delta the delta parameter.
+ * @param diameter the variable to optimize.
  */
 AIG* aig_new(kMST* kmst, long double a_max, long double b_max,
-             long epsilon, long delta);
+             long epsilon, long diameter);
 
 /**
  * Frees the memory used by the Algorithm of the Innovative Gunner.
