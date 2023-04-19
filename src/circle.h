@@ -33,3 +33,36 @@ Circle* circle_new(double radius, Point* center);
  * @param circle.
  */
 void circle_free(Circle* circle);
+
+/**
+ * Sets the radius of the circle.
+ * @param circle the circle.
+ * @param radius the new radius.
+ */
+void circle_set_radius(Circle* circle, double radius);
+
+/**
+ * Returns the radius of the circle.
+ * @param circle the circle.
+ * @return the radius.
+ */
+double circle_radius(Circle* circle);
+
+/**
+ * Tells whether the points is or not
+ * inside the circle.
+ * @param circle The circle.
+ * @param point the point,
+ * @return 1, if the point in located inside
+ * the circle; 0, otherwise.
+ */
+int circle_in(Circle* circle, Point* point);
+
+/**
+ * Counts the points contained in the circle.
+ * @param circle the circle.
+ * @param points the original set of points.
+ * @param n the number of original points.
+ * @return the number of points.
+ */
+int circle_points(Circle* circle, Point** points, int n);

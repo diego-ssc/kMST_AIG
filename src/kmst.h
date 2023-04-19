@@ -51,6 +51,20 @@ Tree* kmst_tree(kMST* kmst);
 Point** kmst_points(kMST* kmst);
 
 /**
+ * Returns the total number of points.
+ * @param kmst the problem instance.
+ * @return the total number of points.
+ */
+int kmst_point_n(kMST* kmst);
+
+/**
+ * Returns the k value.
+ * @param kmst the problem instance.
+ * @return the k value.
+ */
+int kmst_k(kMST* kmst);
+
+/**
  * Returns the RNG buffer of the problem.
  * @param kmst the problem instance.
  * @return the buffer.

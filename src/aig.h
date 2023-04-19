@@ -19,6 +19,9 @@
 
 #pragma once
 
+#include <stdlib.h>
+#include <math.h>
+
 /**
  * Creates a new Algorithm of the Innovative Gunner Heuristic.
  * @param ksmt the kMST instance.
@@ -35,3 +38,16 @@ AIG* aig_new(kMST* kmst, long double a_max, long double b_max,
  * @param aig the heuristic to be freed.
  */
 void aig_free(AIG* aig);
+
+/**
+ * Computes the circle.
+ * @param aig the heuristic.
+ * @return the initial circle.
+ */
+Circle* aig_circle(AIG* aig);
+
+/**
+ * Begins the execution of the heuristic.
+ * @param aig the heuristic.
+ */
+void aig(AIG* aig);

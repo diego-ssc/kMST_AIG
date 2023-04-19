@@ -78,6 +78,16 @@ Point** kmst_points(kMST* kmst) {
   return kmst->points;
 }
 
+/* Returns the total number of points. */
+int kmst_point_n(kMST* kmst) {
+  return kmst->n;
+}
+
+/* Returns the k value. */
+int kmst_k(kMST* kmst) {
+  return kmst->k;
+}
+
 /* Returns the RNG buffer of the problem. */
 struct drand48_data* kmst_buffer(kMST* kmst) {
   return kmst->buffer;

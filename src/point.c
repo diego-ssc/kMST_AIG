@@ -71,14 +71,21 @@ void free_point_array(Point*** points, int n) {
 }
 
 /* Computes the distance between two points. */
-long double point_distance(Point* p1, Point* p2) {
-  return sqrt(pow(fabs(p1->x - p2->x), 2) + pow(fabs(p1->y - p2->y), 2));
+double point_distance(Point* p_1, Point* p_2) {
+  return sqrt(pow(fabs(p_1->x - p_2->x), 2) + pow(fabs(p_1->y - p_2->y), 2));
+}
+
+/* Computes the middle point between two points. */
+Point* middle_point(Point* p_1, Point* p_2) {
+  return point_new((point_x(p_1) + point_x(p_2))/2,
+                   (point_y(p_1) + point_y(p_2))/2);
 }
 
 /* Copies the given point. */
 Point* point_copy(Point* point) {
   /* Heap allocation. */
   Point* p = malloc(sizeof(struct _Point));
+
   /* Value copy. */
   p->x = point->x;
   p->y = point->y;

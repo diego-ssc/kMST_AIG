@@ -65,8 +65,16 @@ void free_point_array(Point*** points, int n);
  * @param p1 the first point.
  * @param p2 the second point.
  */
-long double point_distance(Point* p1, Point* p2);
-                                
+double point_distance(Point* p1, Point* p2);
+
+/**
+ * Computes the middle point between two points.
+ * @param p_1 the first point.
+ * @param p_2 the second point.
+ * @return the middle point.
+ */
+Point* middle_point(Point* p_1, Point* p_2);
+
 /**
  * Copies the given point.
  * @param point the point.

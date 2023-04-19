@@ -19,8 +19,6 @@
 
 #include "heuristic.h"
 
-#include <stdlib.h>
-
 #define A_MAX 30
 #define B_MAX 30
 #define EPSILON 100000
@@ -64,11 +62,42 @@ void aig_free(AIG* aig) {
   free(aig);
 }
 
-void initial_circle(AIG* aig) {
+/* Computes the circle. */
+Circle* aig_circle(AIG* aig) {
   long int i = 0, j = 0;
   Point** points = kmst_points(aig->kmst);
-  while (i == j) {
+  while (i == j) { //For each pair of points?
     lrand48_r(kmst_buffer(aig->kmst), &i);
-    lrand48_r(kmst_buffer(aig->kmst), &j);    
+    lrand48_r(kmst_buffer(aig->kmst), &j);
   }
+
+  Point* p_1 = *(points + i);
+  Point* p_2 = *(points + j);
+  Point* m   = middle_point(p_1, p_2);
+  Circle* c = circle_new((point_distance(p_1, p_2)/2)*sqrt(3), m);
+  free(m);
+
+  return c;
+}
+
+/* Begins the execution of the heuristic. */
+void aig(AIG* aig) {
+  Circle* c = 0;
+  int n = 0;
+  long double r_1, r_2;
+
+  do {
+    if (c)
+      free(c);
+    c = aig_circle(aig);
+    /* circle_set_radius(c, circle_radius(c)*acos(a_max)*acos(b_max)); */
+    n = circle_points(c, kmst_points(aig->kmst),
+                      kmst_point_n(aig->kmst));
+    /* drand48_r(kmst_buffer(aig->kmst), &r_1); */
+    /* drand48_r(kmst_buffer(aig->kmst), &r_2); */
+    /* a_max *= r_1; */
+    /* b_max *= r_2; */
+  } while (n < kmst_k(aig->kmst));
+  
+  circle_free(c);
 }
