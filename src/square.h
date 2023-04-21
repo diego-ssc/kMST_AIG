@@ -19,50 +19,34 @@
 
 #pragma once
 
-#include <stdlib.h>
+/**
+ * Creates a new Square.
+ * @param p_1 the first corner.
+ * @param p_2 the second corner.
+ */
+Square* square_new(Point* p_1, Point* p_2);
 
 /**
- * Creates a new Circle
- * @param radius the radius.
- * @param center the middle point.
+ * Frees the memory used by the Square.
+ * @param square the square,
  */
-Circle* circle_new(double radius, Point* center);
-
-/**
- * Frees the memory used by the Circle.
- * @param circle.
- */
-void circle_free(Circle* circle);
-
-/**
- * Sets the radius of the circle.
- * @param circle the circle.
- * @param radius the new radius.
- */
-void circle_set_radius(Circle* circle, double radius);
-
-/**
- * Returns the radius of the circle.
- * @param circle the circle.
- * @return the radius.
- */
-double circle_radius(Circle* circle);
+void square_free(Square* square);
 
 /**
  * Tells whether the point is or not
- * inside the circle.
- * @param circle The circle.
- * @param point the point,
+ * inside the square.
+ * @param square the square.
+ * @param point the point.
  * @return 1, if the point is located inside
- * the circle; 0, otherwise.
+ * the square; 0, otherwise.
  */
-int circle_in(Circle* circle, Point* point);
+int square_in(Square* square, Point* point);
 
 /**
  * Counts the points contained in the circle.
- * @param circle the circle.
+ * @param square the square.
  * @param points the original set of points.
  * @param n the original number of points.
  * @return the number of points.
  */
-int circle_points(Circle* circle, Point** points, int n);
+int square_points(Square* square, Point** points, int n);

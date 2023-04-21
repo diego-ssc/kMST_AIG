@@ -19,9 +19,10 @@
 
 #include "heuristic.h"
 
-#define A_MAX 30
-#define B_MAX 30
-#define EPSILON 100000
+#define A_MAX          30
+#define B_MAX          30
+#define EPSILON        100000
+#define MAX_ITERATIONS 15000
 
 /* The AIG structure. */
 struct _AIG {
@@ -83,6 +84,7 @@ Circle* aig_circle(AIG* aig) {
 /* Begins the execution of the heuristic. */
 void aig(AIG* aig) {
   Circle* c = 0;
+  Square* s;
   int n = 0;
   long double r_1, r_2;
 
@@ -98,6 +100,22 @@ void aig(AIG* aig) {
     /* a_max *= r_1; */
     /* b_max *= r_2; */
   } while (n < kmst_k(aig->kmst));
-  
+  if (c)
+    free(c);
+
+  int a = 0;
+  c = 0;
+  while (a < MAX_ITERATIONS) {
+    if (c)
+      free(c);
+    c = aig_circle(aig);
+    circle_set_radius(c, circle_radius(c)*acos(a_max)*acos(b_max));
+    s = square_new();
+    drand48_r(kmst_buffer(aig->kmst), &r_1);
+    drand48_r(kmst_buffer(aig->kmst), &r_2);
+    a_max *= r_1;
+    b_max *= r_2;
+    a++;
+  }
   circle_free(c);
 }

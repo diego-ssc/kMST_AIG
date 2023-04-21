@@ -59,13 +59,8 @@ double circle_radius(Circle* circle) {
 /* Tells whether the points is or not
  * inside the circle. */
 int circle_in(Circle* circle, Point* point) {
-  double h_max = point_x(circle->m_point) + circle->radius;
-  double h_min = point_x(circle->m_point) - circle->radius;
-  double v_max = point_y(circle->m_point) + circle->radius;
-  double v_min = point_y(circle->m_point) - circle->radius;
-
-  return (h_min <= point_x(point)) && (h_max >= point_x(point))
-      && (v_min <= point_y(point)) && (v_max >= point_y(point));
+  return point_distance(circle->m_point, point)
+    <= circle->radius;
 }
 
 /* Counts the points contained in the circle. */
