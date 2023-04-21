@@ -31,6 +31,11 @@ static void usage() {
 
 /* Executes the main thread of the program. */
 int main(int argc, char** argv) {
-  usage();
+  if (argc == 1)
+    usage();
+  Input_parser* parser = input_parser_new(*(argv+1));
+  Point** points = parse(parser);
+  Edge* edges = kruskal(points, 149);
+  /* for (int i = 0; i < ) */
   return 0;
 }

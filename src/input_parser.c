@@ -29,7 +29,7 @@ struct _Input_parser {
 };
 
 /* Counts the number of points contained in thwe file. */
-static void point_counter(Input_parser*);
+static int point_counter(Input_parser*);
 
 /* Creates a new Input Parser. */
 Input_parser* input_parser_new(char* fn) {
@@ -40,7 +40,9 @@ Input_parser* input_parser_new(char* fn) {
   parser->fp = fopen(fn, "r");
 
   /* Heap initialization. */
-  point_counter(parser);
+  parser->n = point_counter(parser);
+  fclose(parser->fp);
+  parser->fp = fopen(fn, "r");
   parser->points = point_array(parser->n);
 
   return parser;
@@ -62,9 +64,13 @@ Point** parse(Input_parser* parser) {
     *(parser->points + i) = point_new(x, y);
     ++i;
   }
-  return 0;
+  return parser->points;
 }
 
 /* Counts the number of points contained in thwe file. */
-static void point_counter(Input_parser* parser) {
+static int point_counter(Input_parser* parser) {
+  int i = 0;
+  while (EOF != fscanf(parser->fp, "%*f,%*f\n"))
+    ++i;
+  return i;
 }

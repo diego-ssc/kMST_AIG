@@ -51,3 +51,10 @@ Circle* aig_circle(AIG* aig);
  * @param aig the heuristic.
  */
 void aig(AIG* aig);
+
+/**
+ * Creates the point array of the problem instance.
+ * @param aig the heuristic.
+ * @return the point array.
+ */
+Point** aig_array(AIG* aig);

@@ -33,6 +33,20 @@ Square* square_new(Point* p_1, Point* p_2);
 void square_free(Square* square);
 
 /**
+ * Returns the number of points contained in the square.
+ * @param square the square.
+ * @return the number of points.
+ */
+int square_n(Square* square);
+
+/**
+ * Sets the number of points contained in the square.
+ * @param square the square.
+ * @param n_points the number of points.
+ */
+void square_set_n_points(Square* square, int n_points);
+
+/**
  * Tells whether the point is or not
  * inside the square.
  * @param square the square.
@@ -49,4 +63,40 @@ int square_in(Square* square, Point* point);
  * @param n the original number of points.
  * @return the number of points.
  */
-int square_points(Square* square, Point** points, int n);
+int square_n_points(Square* square, Point** points, int n);
+
+/**
+ * Returns the points contained in the square.
+ * @param square the square.
+ * @param points the original set of points.
+ * @param n the original number of points.
+ * @return the points.
+ */
+Point** square_points(Square* square, Point** points, int n);
+
+/**
+ * Returns the side length of the square.
+ * @param square the square.
+ * @return the side length.
+ */
+double square_side(Square* square);
+
+/**
+ * Returns the sub-squares of the square.
+ * @param square the square.
+ * @param k the number of sub-squares.
+ * @param points the original set of points.
+ * @param n the original set of points quantity.
+ * @return the square matrix.
+ */
+Square** square_cells(Square* square, int k,
+                      Point** points, int n);
+
+/**
+ * Compares two squares.
+ * @param s_1 the first square.
+ * @param s_2 the second square.
+ * @return an integer less, equal or greater than 0;
+ * if s_1 is less, equal or greater than s_2.
+ */
+int square_compare(const void* s_1, const void* s_2);

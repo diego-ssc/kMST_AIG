@@ -46,6 +46,16 @@ void point_free(Point* point) {
   free(point);
 }
 
+/* Sets the x coordinate of the point. */
+void point_set_x(Point* point, double x) {
+  point->x = x;
+}
+
+/* Sets the y coordinate of the point. */
+void point_set_y(Point* point, double y) {
+  point->y = y;
+}
+
 /* Returns the x coordinate of the point. */
 double point_x(Point* point) {
   return point->x;

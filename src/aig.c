@@ -38,6 +38,8 @@ struct _AIG {
   long double diameter;
   /* The adjacency matrix. */
   double** m;
+  /* The ordered selected cells. */
+  Square** cells;
 };
 
 /* Creates a new Algorithm of the Innovative Gunner Heuristic. */
@@ -60,6 +62,8 @@ AIG* aig_new(kMST* kmst, long double a_max, long double b_max,
 void aig_free(AIG* aig) {
   if (aig->kmst)
     kmst_free(aig->kmst);
+  if (aig->m)
+    free(aig->m);
   free(aig);
 }
 
@@ -84,38 +88,63 @@ Circle* aig_circle(AIG* aig) {
 /* Begins the execution of the heuristic. */
 void aig(AIG* aig) {
   Circle* c = 0;
-  Square* s;
+  Square* s, **selected = calloc(1, sizeof(Square*)*kmst_k(aig->kmst));
   int n = 0;
-  long double r_1, r_2;
+  double r_1, r_2;
 
   do {
     if (c)
       free(c);
     c = aig_circle(aig);
-    /* circle_set_radius(c, circle_radius(c)*acos(a_max)*acos(b_max)); */
     n = circle_points(c, kmst_points(aig->kmst),
                       kmst_point_n(aig->kmst));
-    /* drand48_r(kmst_buffer(aig->kmst), &r_1); */
-    /* drand48_r(kmst_buffer(aig->kmst), &r_2); */
-    /* a_max *= r_1; */
-    /* b_max *= r_2; */
   } while (n < kmst_k(aig->kmst));
   if (c)
     free(c);
 
-  int a = 0;
+  int a = 0, i;
   c = 0;
-  while (a < MAX_ITERATIONS) {
-    if (c)
-      free(c);
-    c = aig_circle(aig);
-    circle_set_radius(c, circle_radius(c)*acos(a_max)*acos(b_max));
-    s = square_new();
-    drand48_r(kmst_buffer(aig->kmst), &r_1);
-    drand48_r(kmst_buffer(aig->kmst), &r_2);
-    a_max *= r_1;
-    b_max *= r_2;
-    a++;
+  n = 0;
+  /* while (a < MAX_ITERATIONS) { */
+  if (c)
+    free(c);
+  c = aig_circle(aig);
+  circle_set_radius(c, circle_radius(c)*acos(aig->a_max)*acos(aig->b_max));
+  s = circumscribing_square(c);
+  Square** cells = square_cells(s, kmst_k(aig->kmst) * kmst_k(aig->kmst), kmst_points(aig->kmst),
+                                kmst_point_n(aig->kmst));
+  int total = floor(square_side(s)) * floor(square_side(s));
+  qsort(cells, total, sizeof(Square*), square_compare);
+  for (i = 0; i < total; ++i) {
+    *(selected+i) = *(cells+i);
+    n += square_n_points(*(cells+i), kmst_points(aig->kmst), kmst_point_n(aig->kmst));
+    if (n >= kmst_k(aig->kmst))
+      break;
   }
+  aig->cells = selected;
+
+  drand48_r(kmst_buffer(aig->kmst), &r_1);
+  drand48_r(kmst_buffer(aig->kmst), &r_2);
+  aig->a_max *= r_1;
+  aig->b_max *= r_2;
+  a++;
+  /* } */
   circle_free(c);
+}
+
+/* Creates the point array. */
+Point** aig_array(AIG* aig) {
+  int i, j, l = 0;
+  Point** points = calloc(1, sizeof(Point*)* kmst_k(aig->kmst));
+  Point** t;
+  for (i = 0; i < kmst_k(aig->kmst); ++i) {
+    t = square_points(*(aig->cells + i), kmst_points(aig->kmst), kmst_point_n(aig->kmst));
+    for (j = 0; j < square_n(*(aig->cells + i)) * sizeof(Point*); ++j) {
+      *(points+l) = point_copy(*(t+j));
+      point_free(*(t+j));
+      l++;
+    }
+    free(t);
+  }
+  return points;
 }

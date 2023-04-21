@@ -71,3 +71,17 @@ int circle_points(Circle* circle, Point** points, int n) {
       c++;
   return c;
 }
+
+/* Returns the circumscribing square of the circle. */
+Square* circumscribing_square(Circle* circle) {
+  Point* p = circle->m_point;
+  double r = circle->radius;
+  
+  Point* a = point_new(point_x(p) + r, point_y(p) + r);
+  Point* b = point_new(point_x(p) - r, point_y(p) - r);
+  Square* s = square_new(a, b);
+  free(a);
+  free(b);
+
+  return s;
+}

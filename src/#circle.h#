@@ -72,4 +72,4 @@ int circle_points(Circle* circle, Point** points, int n);
  * @param circle circle the circle.
  * @return the circumscribing square.
  */
-Square* circumscribing_square(Circle* circle);
+Square* circumscribing_square(Circle* circle);6

@@ -33,6 +33,20 @@ Point* point_new(double x, double y);
 void point_free(Point* point);
 
 /**
+ * Sets the x coordinate of the point.
+ * @param point the point.
+ * @param x the x coordinate.
+ */
+void point_set_x(Point* point, double x);
+
+/**
+ * Sets the y coordinate of the point.
+ * @param point the point.
+ * @param y the y coordinate.
+ */
+void point_set_y(Point* point, double y);
+
+/**
  * Returns the x coordinate of the point.
  * @param point the point.
  * @return the x coordinate.

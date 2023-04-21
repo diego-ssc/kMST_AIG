@@ -19,8 +19,6 @@
 
 #include "heuristic.h"
 
-#include <stdlib.h>
-
 /* The tree structure. */
 struct _Tree {
   /* The points. */
@@ -63,11 +61,18 @@ static void copy_points(Tree* tree, Point** points) {
     *(tree->points + i) = point_copy(*(points + i));
 }
 
-typedef struct {
-  int u, v, w;
-} Edge;
+Point_Kruskal* point_kruskal_new(Point* point, int id) {
+  Point_Kruskal* p_k = malloc(sizeof(Point_Kruskal));
+  p_k->point = point;
+  p_k->id = id;
+  return p_k;
+}
 
-static int eequal(const void* a, const void* b) {
+/* point_kruskal_free(Point_Kruskal* p_k) { */
+/*   if () */
+/* } */
+
+static int edge_compare(const void* a, const void* b) {
   return ((Edge*)a)->w - ((Edge*)b)->w < 0;
 }
 
@@ -82,31 +87,38 @@ void k_union(int* b, int c1, int c2, int n) {
       *(b+i) = c1;
 }
 
-void kruskal(double** m, int n) {
-  int i, j, cno1, cno2;
+Edge* kruskal(Point** points, int n) {
+  int i, j, cluster_1, cluster_2;
   int t = n*(n-1)/2, a = n;
-  Edge l[t], span[t];
-  int b[n];
-  for (i = 1; i < n; i++)
-    for (j = 0; j < i; j++) {
-      (l+n-a)->u = i;
-      (l+n-a)->v = j;
-      (l+n-a)->w = *(*(m+i)+j);
-      --a;
-    }
-  qsort(l, t, sizeof(Edge), eequal);
-  
-  for (i = 0; i < n; i++)
-    *(b+i) = i;
+  Edge *edges = calloc(1, sizeof(Edge)*t), *span = calloc(1, sizeof(Edge)*t);
+  int* belongs = calloc(1, sizeof(int)*t);
 
-  a = n;
-  for (i = 0; i < t; i++) {
-    cno1 = find(b, (l+i)->u);
-    cno2 = find(b, (l+i)->v);
-    if (cno1 != cno2) {
-      *(span+n-a) = *(l+i);
-      k_union(b, cno1, cno2, n);
+  for (i = 0; i < n; i++)
+    for (j = i+1; j < n; j++) {
+      (edges+n-a)->p = point_kruskal_new(*(points+i), n-a);
+      (edges+n-a)->q = point_kruskal_new(*(points+j), n-a);
+      (edges+n-a)->w = point_distance((edges+n-a)->p->point,
+                                       (edges+n-a)->q->point);
       --a;
     }
-  } 
-} 
+  
+  qsort(edges, t, sizeof(Edge), edge_compare);
+
+  for (i = 0; i < t; i++)
+    *(belongs+i) = i;
+ 
+  a = n;
+  int l = 0;
+  for (i = 0; i < t; i++) {
+    cluster_1 = find(belongs, (edges+i)->p->id);
+    cluster_2 = find(belongs, (edges+i)->q->id);
+    if (cluster_1 != cluster_2) {
+      *(span+n-a) = *(edges+i);
+      l++;
+      k_union(belongs, cluster_1, cluster_2, n);
+      --a;
+    }
+  }
+  printf("Span size: %d\n", l);
+  return span;
+}
