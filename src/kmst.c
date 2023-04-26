@@ -35,9 +35,6 @@ struct _kMST {
   struct drand48_data *buffer;
 };
 
-/* Selects the initial solution. */
-static Point** initial_solution(kMST*, int);
-
 /* Creates a new k-minimum spanning tree problem instance. */
 kMST* kmst_new(Point** points, int k, int n, long int seedval) {
   /* Heap allocation. */
@@ -51,9 +48,7 @@ kMST* kmst_new(Point** points, int k, int n, long int seedval) {
   /* RNG. */
   kmst->buffer = malloc(sizeof(struct drand48_data));
   srand48_r(seedval, kmst->buffer);
-  Point** initial = initial_solution(kmst, k);
-  kmst->tree = tree_new(initial, k);
-  free(initial);
+  kmst->tree = 0;
 
   return kmst;
 }
@@ -88,20 +83,12 @@ int kmst_k(kMST* kmst) {
   return kmst->k;
 }
 
+/* Sets the best solution. */
+void kmst_set_tree(kMST* kmst, Tree* tree) {
+  kmst->tree = tree;
+}
+
 /* Returns the RNG buffer of the problem. */
 struct drand48_data* kmst_buffer(kMST* kmst) {
   return kmst->buffer;
-}
-
-/* Selects the initial solution. */
-static Point** initial_solution(kMST* kmst, int k) {
-  int i;
-  long int* result = calloc(1, sizeof(long int));
-  Point** points = point_array(k);
-  for (i = 0; i < k; ++i) {
-    lrand48_r(kmst->buffer, result);
-    *(points + i) = *(kmst->points + (*result % k));
-  }
-  free(result);
-  return points;
 }

@@ -28,10 +28,9 @@
  * @param a_max the first maximum angle.
  * @param b_max the first maximum angle.
  * @param epsilon the epsilon parameter.
- * @param diameter the variable to optimize.
  */
-AIG* aig_new(kMST* kmst, long double a_max, long double b_max,
-             long epsilon, long diameter);
+AIG* aig_new(kMST* kmst, double a_max, double b_max,
+             int epsilon);
 
 /**
  * Frees the memory used by the Algorithm of the Innovative Gunner.
@@ -42,19 +41,14 @@ void aig_free(AIG* aig);
 /**
  * Computes the circle.
  * @param aig the heuristic.
+ * @param i the first index of the point.
+ * @param j the second index of the point.
  * @return the initial circle.
  */
-Circle* aig_circle(AIG* aig);
+Circle* aig_circle(AIG* aig, int i, int j);
 
 /**
  * Begins the execution of the heuristic.
  * @param aig the heuristic.
  */
-void aig(AIG* aig);
-
-/**
- * Creates the point array of the problem instance.
- * @param aig the heuristic.
- * @return the point array.
- */
-Point** aig_array(AIG* aig);
+void aig_heuristic(AIG* aig);

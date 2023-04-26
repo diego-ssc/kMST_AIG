@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "heuristic.h"
 
@@ -33,9 +34,27 @@ static void usage() {
 int main(int argc, char** argv) {
   if (argc == 1)
     usage();
+  
   Input_parser* parser = input_parser_new(*(argv+1));
-  Point** points = parse(parser);
-  Edge* edges = kruskal(points, 149);
-  /* for (int i = 0; i < ) */
+  kMST* kmst = kmst_new(parse(parser), 10, parser_n(parser), 584);
+  AIG* aig = aig_new(kmst, 0.2, 0.2, 100000);
+  aig_heuristic(aig);
+
+  Edge* span = kruskal(kmst_tree(kmst));
+  double w = 0;
+  printf("Span size: %d\n", tree_span_size(kmst_tree(kmst)));
+  for (int i = 0; i < tree_span_size(kmst_tree(kmst)); ++i) {
+    w += edge_w(edge_array_position(span, i));
+    printf("(%s, %s) :: %f\n",
+           point_to_string(edge_p(edge_array_position(span, i))),
+           point_to_string(edge_q(edge_array_position(span, i))),
+           edge_w(edge_array_position(span, i)));
+  }
+  printf("Cost: %f\n", w);
+  free(span);
+  
+  aig_free(aig);
+  input_parser_free(parser);
+
   return 0;
 }

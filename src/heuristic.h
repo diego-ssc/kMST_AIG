@@ -50,14 +50,14 @@ typedef struct _Tree Tree;
 typedef struct _Circle Circle;
 
 /**
- * The Square opaque structure.
+ * The Edge opaque structure.
  */
-typedef struct _Square Square;
+typedef struct _Edge Edge;
 
+#include "edge.h"
 #include "point.h"
 #include "input_parser.h"
 #include "tree.h"
 #include "kmst.h"
 #include "aig.h"
 #include "circle.h"
-#include "square.h"

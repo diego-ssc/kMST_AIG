@@ -18,7 +18,7 @@ src = [
   'src/tree.c',
   'src/aig.c',
   'src/circle.c',
-  'src/square.c'
+  'src/edge.c'
 ]
 
 includes = include_directories('src/')

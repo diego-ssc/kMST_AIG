@@ -19,32 +19,25 @@
 
 #include "heuristic.h"
 
-#define A_MAX          30
-#define B_MAX          30
-#define EPSILON        100000
-#define MAX_ITERATIONS 15000
+#define MAX_ITERATIONS 2
 
 /* The AIG structure. */
 struct _AIG {
   /* The k-minimum spanning tree problem. */
   kMST* kmst;
   /* The first maximum angle value. */
-  long double a_max;
+  double a_max;
   /* The second maximum angle value. */
-  long double b_max;
+  double b_max;
   /* The epsilon parameter. */
-  long double epsilon;
+  int epsilon;
   /* The variable to optimize. */
-  long double diameter;
-  /* The adjacency matrix. */
-  double** m;
-  /* The ordered selected cells. */
-  Square** cells;
+  double diameter;
 };
 
 /* Creates a new Algorithm of the Innovative Gunner Heuristic. */
-AIG* aig_new(kMST* kmst, long double a_max, long double b_max,
-             long epsilon, long diameter) {
+AIG* aig_new(kMST* kmst, double a_max, double b_max,
+             int epsilon) {
   /* Heap allocation. */
   AIG* aig = malloc(sizeof(struct _AIG));
 
@@ -53,7 +46,6 @@ AIG* aig_new(kMST* kmst, long double a_max, long double b_max,
   aig->a_max    = a_max;
   aig->b_max    = b_max;
   aig->epsilon  = epsilon;
-  aig->diameter = diameter;
 
   return aig;
 }
@@ -62,89 +54,92 @@ AIG* aig_new(kMST* kmst, long double a_max, long double b_max,
 void aig_free(AIG* aig) {
   if (aig->kmst)
     kmst_free(aig->kmst);
-  if (aig->m)
-    free(aig->m);
   free(aig);
 }
 
 /* Computes the circle. */
-Circle* aig_circle(AIG* aig) {
-  long int i = 0, j = 0;
+Circle* aig_circle(AIG* aig, int i, int j) {
   Point** points = kmst_points(aig->kmst);
-  while (i == j) { //For each pair of points?
-    lrand48_r(kmst_buffer(aig->kmst), &i);
-    lrand48_r(kmst_buffer(aig->kmst), &j);
-  }
 
   Point* p_1 = *(points + i);
   Point* p_2 = *(points + j);
   Point* m   = middle_point(p_1, p_2);
   Circle* c = circle_new((point_distance(p_1, p_2)/2)*sqrt(3), m);
-  free(m);
+  point_free(m);
 
   return c;
 }
 
 /* Begins the execution of the heuristic. */
-void aig(AIG* aig) {
+void aig_heuristic(AIG* aig) {
+  /* The circle. */
   Circle* c = 0;
-  Square* s, **selected = calloc(1, sizeof(Square*)*kmst_k(aig->kmst));
-  int n = 0;
-  double r_1, r_2;
 
-  do {
-    if (c)
-      free(c);
-    c = aig_circle(aig);
-    n = circle_points(c, kmst_points(aig->kmst),
-                      kmst_point_n(aig->kmst));
-  } while (n < kmst_k(aig->kmst));
-  if (c)
-    free(c);
+  /* The point counter. */
+  int n;
 
-  int a = 0, i;
-  c = 0;
-  n = 0;
-  /* while (a < MAX_ITERATIONS) { */
-  if (c)
-    free(c);
-  c = aig_circle(aig);
-  circle_set_radius(c, circle_radius(c)*acos(aig->a_max)*acos(aig->b_max));
-  s = circumscribing_square(c);
-  Square** cells = square_cells(s, kmst_k(aig->kmst) * kmst_k(aig->kmst), kmst_points(aig->kmst),
-                                kmst_point_n(aig->kmst));
-  int total = floor(square_side(s)) * floor(square_side(s));
-  qsort(cells, total, sizeof(Square*), square_compare);
-  for (i = 0; i < total; ++i) {
-    *(selected+i) = *(cells+i);
-    n += square_n_points(*(cells+i), kmst_points(aig->kmst), kmst_point_n(aig->kmst));
-    if (n >= kmst_k(aig->kmst))
-      break;
-  }
-  aig->cells = selected;
+  /* The indexes. */
+  int i, j;
 
-  drand48_r(kmst_buffer(aig->kmst), &r_1);
-  drand48_r(kmst_buffer(aig->kmst), &r_2);
-  aig->a_max *= r_1;
-  aig->b_max *= r_2;
-  a++;
-  /* } */
-  circle_free(c);
-}
+  /* The generated tree. */
+  Tree* tree = 0, *best = 0;
 
-/* Creates the point array. */
-Point** aig_array(AIG* aig) {
-  int i, j, l = 0;
-  Point** points = calloc(1, sizeof(Point*)* kmst_k(aig->kmst));
-  Point** t;
-  for (i = 0; i < kmst_k(aig->kmst); ++i) {
-    t = square_points(*(aig->cells + i), kmst_points(aig->kmst), kmst_point_n(aig->kmst));
-    for (j = 0; j < square_n(*(aig->cells + i)) * sizeof(Point*); ++j) {
-      *(points+l) = point_copy(*(t+j));
-      point_free(*(t+j));
-      l++;
+  /* The problem instance data. */
+  Point** points = kmst_points(aig->kmst);
+  int p_n = kmst_point_n(aig->kmst);
+  int k = kmst_k(aig->kmst);
+
+  /* The points contained within the circle. */
+  Point** c_points;
+
+  Edge* span_1 = 0;
+  double new_eval;
+  double old_eval = 100000;
+  int max = MAX_ITERATIONS;
+
+  for (i = 0; i < kmst_point_n(aig->kmst); ++i) {
+    for (j = i+1; j < kmst_point_n(aig->kmst); ++j) {
+      /* Computing the generated circle. */
+      c = aig_circle(aig, 1, 4);
+
+      /* Setting the new attributes. */
+      circle_set_radius(c, circle_radius(c)*sqrt(3));
+
+      /* Computing the number of points. */
+      n = circle_n_points(c, points, p_n);
+
+      circle_set_n(c, n);
+
+      if (n < k)
+        continue;
+      max = MAX_ITERATIONS;
+      while ((circle_n(c) >= k) && max--) {
+        c_points = circle_points(c, points, p_n);
+
+        tree = tree_new(c_points, k);
+
+        span_1 = kruskal(tree);
+        new_eval = eval_edge_array(span_1, k - 1);
+
+        if (new_eval < old_eval) {
+          old_eval = new_eval;
+          if (best)
+            tree_free(best);
+          best = tree_copy(tree);
+        }
+        if (tree)
+          tree_free(tree);
+
+        free_point_array(&c_points, circle_n(c));
+        n = circle_n_points(c, points, p_n);
+        circle_set_n(c, n);
+        circle_set_radius(c, circle_radius(c)*acos(aig->a_max)*acos(aig->b_max));
+
+        free(span_1);
+      }
+
+      circle_free(c);
     }
-    free(t);
   }
-  return points;
+  kmst_set_tree(aig->kmst, best);
 }

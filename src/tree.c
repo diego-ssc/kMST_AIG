@@ -25,14 +25,20 @@ struct _Tree {
   Point** points;
   /* Tree size. */
   int k;
-  /* The adjacency matrix. */
-  double** m;
+  /* The span size. */
+  int n;
+  /* The array used by the Kruskal algorithm. */
+  int* belongs;
 };
 
 /* Copies the given points into the tree structure. */
 static void copy_points(Tree*, Point**);
 
-/* static void create_adj_matrix(); */
+/* Auxiliary function for the union-find algorithm. */
+static int find(int*, int);
+
+/* Auxiliary function for the union-find algorithm. */
+static void k_union(int*, int, int, int);
 
 /* Creates a new Tree. */
 Tree* tree_new(Point** points, int k) {
@@ -45,12 +51,19 @@ Tree* tree_new(Point** points, int k) {
 
   /* Value initialization. */
   copy_points(tree, points);
+  tree->belongs = calloc(1, sizeof(int)*k);
+  for (int i = 0; i < k; i++)
+    *(tree->belongs+i) = i;
 
   return tree;
 }
 
 /* Frees the memory used by the tree. */
 void tree_free(Tree* tree) {
+  if (tree->points)
+    free_point_array(&tree->points, tree->k);
+  if(tree->belongs)
+    free(tree->belongs);
   free(tree);
 }
 
@@ -61,64 +74,75 @@ static void copy_points(Tree* tree, Point** points) {
     *(tree->points + i) = point_copy(*(points + i));
 }
 
-Point_Kruskal* point_kruskal_new(Point* point, int id) {
-  Point_Kruskal* p_k = malloc(sizeof(Point_Kruskal));
-  p_k->point = point;
-  p_k->id = id;
-  return p_k;
-}
-
-/* point_kruskal_free(Point_Kruskal* p_k) { */
-/*   if () */
-/* } */
-
-static int edge_compare(const void* a, const void* b) {
-  return ((Edge*)a)->w - ((Edge*)b)->w < 0;
-}
-
-int find(int* b, int n) {
+/* Auxiliary function for the union-find algorithm. */
+static int find(int* b, int n) {
   return *(b+n);
 }
 
-void k_union(int* b, int c1, int c2, int n) {
+/* Auxiliary function for the union-find algorithm. */
+static void k_union(int* b, int c1, int c2, int n) {
   int i;
   for (i = 0; i < n; i++)
     if (*(b+i) == c2)
       *(b+i) = c1;
 }
 
-Edge* kruskal(Point** points, int n) {
+/* Computes the Kruskal algorithm. */
+Edge* kruskal(Tree* tree) {
   int i, j, cluster_1, cluster_2;
-  int t = n*(n-1)/2, a = n;
-  Edge *edges = calloc(1, sizeof(Edge)*t), *span = calloc(1, sizeof(Edge)*t);
-  int* belongs = calloc(1, sizeof(int)*t);
+  int n = tree->k;
+  int t = n*(n-1)/2;
+  Edge *edges = edge_array(t), *span = edge_array(t);
+  int c_1 = 0, c_2 = 0;
 
   for (i = 0; i < n; i++)
     for (j = i+1; j < n; j++) {
-      (edges+n-a)->p = point_kruskal_new(*(points+i), n-a);
-      (edges+n-a)->q = point_kruskal_new(*(points+j), n-a);
-      (edges+n-a)->w = point_distance((edges+n-a)->p->point,
-                                       (edges+n-a)->q->point);
-      --a;
+      edge_set_q(edge_array_position(edges, c_1), *(tree->points + j));
+      edge_set_p(edge_array_position(edges, c_1), *(tree->points + i));
+      edge_set_w(edge_array_position(edges, c_1), point_distance(*(tree->points + i),
+                                                                 *(tree->points + j)));
+      edge_set_i(edge_array_position(edges, c_1), i);
+      edge_set_j(edge_array_position(edges, c_1), j);
+      ++c_1;
     }
-  
-  qsort(edges, t, sizeof(Edge), edge_compare);
 
-  for (i = 0; i < t; i++)
-    *(belongs+i) = i;
- 
-  a = n;
-  int l = 0;
-  for (i = 0; i < t; i++) {
-    cluster_1 = find(belongs, (edges+i)->p->id);
-    cluster_2 = find(belongs, (edges+i)->q->id);
+  qsort(edges, t, edge_size(), edge_compare);
+
+  for (i = 0; i < c_1; i++) {
+    cluster_1 = find(tree->belongs, edge_i(edge_array_position(edges, i)));
+    cluster_2 = find(tree->belongs, edge_j(edge_array_position(edges, i)));
     if (cluster_1 != cluster_2) {
-      *(span+n-a) = *(edges+i);
-      l++;
-      k_union(belongs, cluster_1, cluster_2, n);
-      --a;
+      edge_set_array_position(span, c_2,
+                              edge_array_position(edges, i));
+      ++c_2;
+      k_union(tree->belongs, cluster_1, cluster_2, n);
     }
   }
-  printf("Span size: %d\n", l);
+
+  tree->n = c_2;
+  free(edges);
   return span;
+}
+
+/* Returns the size of the span. */
+int tree_span_size(Tree* tree) {
+  return tree->n;
+}
+
+/* Returns a copy of the tree. */
+Tree* tree_copy(Tree* tree) {
+  /* Heap allocation. */
+  Tree* t = malloc(sizeof(struct _Tree));
+  t->points = point_array(tree->k);
+
+  /* Value copy. */
+  t->k = tree->k;
+
+  /* Value initialization. */
+  copy_points(t, tree->points);
+  t->belongs = calloc(1, sizeof(int)*tree->k);
+  for (int i = 0; i < tree->k; i++)
+    *(t->belongs+i) = i;
+
+  return t;
 }

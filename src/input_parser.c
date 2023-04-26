@@ -74,3 +74,8 @@ static int point_counter(Input_parser* parser) {
     ++i;
   return i;
 }
+
+/* Returns the number of points. */
+int parser_n(Input_parser* parser) {
+  return parser->n;
+}

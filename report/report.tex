@@ -1,0 +1,357 @@
+\documentclass[a4paper]{report}
+
+\usepackage{pgf}
+\usepackage[utf8]{inputenc}
+\usepackage{verbatim}
+\usepackage{titling}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{qtree}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{times}
+\usepackage{dsfont}
+\usepackage{titling}
+\usepackage{cite}
+\usepackage[spanish]{babel}
+\usepackage{svg}
+\usepackage{titlesec}
+
+\pretitle{\begin{center}\linespread{1}}
+  \posttitle{\end{center}\vspace{0.14cm}}
+\preauthor{\begin{center}\Large}
+  \postauthor{\end{center}}
+
+\setlength{\droptitle}{-10em}
+\title {\textbf {\Large{k - \'Arbol generador de peso m\'inimo}}\protect\\
+  \large{\textbf{Algoritmo del Artillero Innovador}}\protect\\ \vspace{0.4cm}
+  \normalsize{\textbf{Seminario de Ciencias de la Computaci\'on B}} \protect\\ \vspace{0.2cm}
+  \normalsize{Canek Pel\'aez Vald\'es} \protect\\ \vspace{0.4cm}
+  \normalsize{Universidad Nacional Aut\'onoma de M\'exico}}
+\date{}
+\author{\normalsize Sánchez Correa Diego Sebastián}
+
+\makeatletter
+\renewcommand{\@makechapterhead}[1]{%
+\vspace*{50 pt}%
+{\setlength{\parindent}{0pt} \raggedright \normalfont
+\bfseries\Huge\thechapter.\ #1
+\par\nobreak\vspace{40 pt}}}
+\makeatother
+
+\begin{document}
+\allowdisplaybreaks
+\maketitle
+
+\chapter{Introducci\'on}\
+Dada la dificultad de los problemas NP (y dada la misma dificultad que poseen estos para
+reducirse a problemas resolubles en tiempo polinomial) se ha acudido a t\'ecnicas que
+pretenden, sin bases que garanticen su buen funcionamiento, resolver a partir de
+aproximaciones aquellos problemas cuya soluci\'on no es obtenible m\'as que probando
+todas las posibles combinaciones.
+
+Estas t\'ecnicas suelen, en la mayor parte de los casos, conseguir soluciones a partir
+de simulaciones de fen\'omenos del mundo real: el comportamiento de animales, fen\'omenos
+f\'isicos y sociales, entre otros. Estas t\'ecnicas son denominadas heur\'isticas.
+
+El algoritmo del artillero innovador es una heur\'istica que pretende encontrar soluciones
+simulando el comportamiento (a grandes rasgos, y abstrayendo en demas\'ia el proceso)
+de un artillero que tiene como objetivo alcanzar los blancos que, en nuestro contexto,
+ser\'an soluciones del problema.
+
+En este caso, se pretender\'a encontrar aproximaciones que resuelvan el problema del
+k-\'arbol generador de peso m\'inimo.
+
+
+\section{El problema}
+
+\begin{center}
+  \textit{... requerimos de un \'arbol de peso m\'inimo que abarque al menos k nodos
+  en una gr\'afica ponderada. ~\cite{ravi}}
+\end{center}
+Este problema fue formulado por Lozovanu y Zelikovsky, en 1933; adem\'as, en 1966,
+en ~\cite{ravi} se hizo \'enfasis en una concepci\'on construida a partir de puntos en
+el plano euclidiano. Es claro que el valor de \textit{k} debe ser menor al n\'umero
+de nodos, de otra manera se reduce a un problema trivial que puede ser resoluble
+en tiempo polinomial por el algoritmo de Kruskal\footnote{\textit{El algoritmo de Kruskal
+    un bosque de peso m\'inimo de una gr\'afica ponderada no dirigida. Si la gr\'afica
+    es conectada, encuentra un \'arbol generador de peso m\'inimo}~\cite{kruskal}.
+  Complejidad: $O(E \ log \ E)$} y/o Prim\footnote{\textit{Algoritmo "greedy" que encuentra
+    un \'arbol generador de peso m\'inimo es una gr\'afica ponderada no dirigida}~\cite{prim}.
+  Complejidad: $O(|V|^2)$}.
+
+\section{La heur\'istica}
+El algoritmo del artillero innovador, como ya se ha mencionado, pretende simular el
+comportamiento de un artillero \textit{innovador} que pretende acertar a ciertos
+blancos a base de una metodolog\'ia de prueba y error que progresa modificando el
+\'angulo de disparo.
+
+\begin{center}
+  \textit{La innovaci\'on del Algoritmo del Innovador radica en el hecho de que
+    en cada paso del proceso iterativo, la soluci\'on previa es corregida a partir
+  de factores multiplicativos especialmente seleccionados.}~\cite{aig}
+\end{center}
+
+La innovaci\'on que describe es comparada con t\'ecnicas de modificaci\'on aditiva;
+entre estas heur\'isticas se encuentran:
+
+\begin{itemize}
+\item PSO (Eberhart and Kennedy, 1995):
+  \[x_l^{(i+1)} = x_l^{(i)} + v_l^{(i)}\]
+\item SA (Yang, 2010):
+  \[x^{(i+1)} = x^{(i)} + \varepsilon\]
+\item CS (Yang and Deb 2009):
+  \[x_l^{(i+1)} = x_l^{(i)} + \alpha \cdot \textit{L\`evy} (\lambda)\]
+\item GSA (Rashedi, Nezamabadi-pour, and Saryazdi, 2009):
+  \[x_l^{(i+1)} = x_l^{(i)} + v_l^{(i+1)}\]
+\end{itemize}
+
+Esto se justifica argumentando que se pretende reemplazar la depedencia intuitiva,
+con dependencia:
+\footnote{Esto est\'a, por lo tanto, en contra de la concepci\'on de la soluci\'on
+  como una b\'usqueda local; inclin\'andose m\'as a algoritmos gen\'eticos donde
+  el resultado de soluciones previas est\'a, en la mayor parte de los casos,
+totalmente alejada de las soluciones \textit{padres}.}
+
+\[x_l^{(i+1)} = x_l^{(i)} \cdot f_l(\xi)\]
+
+\subsection{Factores Multiplicativos}
+La selecci\'on de los factores multiplicativos (descritos como una f\'ormula aplicada
+ a \'angulos de correci\'on generados aleatoriamente) es crucial, se describen como funciones
+ que deben cumplir:
+\begin{enumerate}
+\item Para valores de los \'angulos de correci\'on $\alpha$ y $\beta$ cercanos a cero,
+  los coeficientes de correci\'on deber\'ian tener un valor cercano a uno.
+  \item Para $\alpha > 0$, $g(\alpha) > 1$
+  \item Para $\alpha < 0$, $g(\alpha) < 1$
+  \item Para \'angulos generados aleatoriamente cercanos a $\alpha_{\textit{m\'ax}}$ y $-\alpha_{\textit{m\'ax}}$,
+    los coeficientes deber\'ian ser claramente diferentes del valor 1 ($g(\alpha) \gg 1,
+    g(\alpha) \ll 1$), para asegurar una correcci\'on lo suficientemente larga a la variable
+    de decisi\'on $\delta$/
+  \end{enumerate}
+
+  Se concluye, entonces, que la funci\'on m\'as adecuada, dadas las especificaciones necesarias,
+  se trata de:
+
+  \begin{align*}
+    g(\alpha) &= \csc(\alpha) = (\cos(\alpha))^{-1} \textit{ para } \alpha > 0\\
+    g(\alpha) &= \cos(\alpha) \textit{ para } \alpha \leq 0\\
+  \end{align*}
+
+  \clearpage
+  As\'i, los pasos de la ejecuci\'on del algoritmo se describen como sigue:
+  \begin{enumerate}
+  \item Seleccionar aleatoriamente los valores componentes del vector de decisi\'on
+    \footnote{La heur\'istica pretende resolver problemas modelados por una funci\'on
+      lineal, la adaptaci\'on al problema se describe en las secciones de Dise\~no e
+      Implementaci\'on}
+    \begin{align*}
+      x_1^0 &= [x_{11}^0, x_{12}^0, ..., x_{1n}^0] \tag{Vector inicial 1}\\
+      x_m^0 &= [x_{m1}^0, x_{m2}^0, ..., x_{mn}^0] \tag{Vector inicial m}\\
+    \end{align*}
+
+  \item Determinar el valor de la funci\'on objetiva para el vector inicial $F_{obj}(x_1^0)
+    ...F_{obj}(x_m^0)$,\\ $ F_{obj\_best} = \min[F_{obj}(x_1^0) ... F_{obj}(x_m^0)]$.
+  \item Inicializar el contador de iteraciones a $i = 1$; sustituci\'on de
+    $x_1^i = x_1^0 ... x_m^i = x_m^0$.
+  \item Determinar el rango de \'angulos de correci\'on $\alpha^i_{\textit{m\'ax}}$
+    y $\beta^i_{\textit{m\'ax}}$.
+    \footnote{La elecci\'on de dos factores multiplicativos no cuenta con justificaci\'on, sin
+      embargo, se describe como una buena elecci\'on a partir de la experimentaci\'on realizada.}
+  \item Ajustar los valores componentes del vector decisi\'on con base en los factores de
+    correci\'on como sigue:\\
+
+      Soluci\'on n\'umero 1: elegir \'angulos de correcci\'on $\alpha^i_{11} ... \alpha^i_{1n}$ y
+      $\beta^i_{11} ... \beta^i_{1n}$ de acuerdo a la distribuci\'on de probabilidad definida
+      \footnote{Distribuci\'on normal, con un valor promedio de cero y una desviaci\'on
+        est\'andar que cumple la dependencia $3 \sigma = \alpha_{\textit{m\'ax}} =
+        \beta_{\textit{m\'ax}}$, asumiendo que, por ejemplo, $\alpha_{\textit{m\'ax}} =
+        \beta_{\textit{m\'ax}} = (\pi/2)$.};
+      corregir los componentes del vector de decisi\'on:
+      \[x_{1,1}^{(i+1)} = x_{1,1}^{(i)} \cdot g(\alpha_{1,1}^i) \cdot g(\beta_{1,1}^i)
+        ...x_{1,n}^{(i+1)} = x_{1,n}^{(i)} \cdot g(\alpha_{1,n}^i) \cdot g(\beta_{1,n}^i)\]
+      Soluci\'on n\'umero m: elegir \'angulos de correcci\'on $\alpha^i_{m1} ... \alpha^i_{mn}$ y
+      $\beta^i_{m1} ... \beta^i_{mn}$ de acuerdo a la distribuci\'on de probabilidad definida;
+      corregir los componentes del vector de decisi\'on:
+      \[x_{m,1}^{(i+1)} = x_{m,1}^{(i)} \cdot g(\alpha_{m,1}^i) \cdot g(\beta_{m,1}^i)
+      ...x_{m,n}^{(i+1)} = x_{m,n}^{(i)} \cdot g(\alpha_{m,n}^i) \cdot g(\beta_{m,n}^i)\]
+
+  \item Determinar el valor de la funci\'on objetivo para las soluciones \textit{1-m}, es decir,
+    \[F_{obj}(x_1^{i+1})...F_{obj}(x_m^{i+1})\]
+
+    Identificar soluci\'on \textit{q} para la cual
+    \[F_{obj}(x_q^{i+1}) = \min[F_{obj}(x_1^{i+1})... F_{obj}(x_m^{i+1})]\]
+
+  \item Si, para la soluci\'on q, $F_{obj}(x_q^{i+1}) < F_{obj\_best}$ se cumple, entonces
+    se sustituir\'a $F_{obj\_best} = F_{obj}(x_q^{i+1})$ y $x_{best} = x_q^{i+1}$.
+  \item Verificar el criterio de finalizaci\'on del algoritmo ($i+1 = i_{\max}$); continuar al
+    final (Paso 9) o regresar al Paso 4 ($i = i+1$).
+  \item El fin del algoritmo; terminamos con los valores $x_{best}$ y $F_{obj\_best}$.
+  \end{enumerate}
+
+  \chapter{Dise\~no}
+  El dise\~no sigui\'o una estructura orientada a objetos, dentro de los l\'imites de la
+  abastracci\'on proporcionada por C(conceptos como herencia o polimorfismo son inexistentes
+  sin una implementaci\'on previa).
+
+  \section{Analizador Sint\'actico}
+  Este objeto se encarga de proveer los datos de entrada a partir de un archivo con el formato
+  \begin{align*}
+    x_1&,y_1\\
+    x_2&,y_2\\
+    \vdots\\
+    x_n&,y_n\\
+  \end{align*}
+  \begin{center}
+    \tiny{\textit{Donde $x$ y $y$ son las coordenadas $x$ y $y$ de los puntos.}}
+  \end{center}
+
+  Este har\'a dos procesos lineales de lectura, acci\'on esencial para calcular el n\'umero de
+  puntos antes de asignar el espacio en el heap para la creaci\'on del arreglo de puntos.
+  Puede pensarse que no ha sido la mejor decisi\'on, haciendo notar que la primera iteraci\'on
+  ser\'ia innecesaria si se usaran listas; pero consider\'e m\'as importante el acceso en tiempo
+  constante que el aumento en uno de un proceso lineal (que, dado que son procesos constantes
+  lineales, sigue siendo, en general, un proceso lineal).
+
+  \subsection{Puntos}
+  Los puntos se abstrayeron en una clase \texttt{point} que, adem\'as, de proveer las coordenadas
+  \textit{x} y \textit{y} en una sola estructura, proporciona comportamiento como el c\'alculo
+  de la distancia euclidiana o el punto medio. Se trata de la estrucura esencial del programa.
+
+  \section{El problema}
+  El problema del k - \'arbol generador de peso m\'inimo se abstrajo en una clase \texttt{kmst},
+  cuya funci\'on es recibir los puntos obtenidos por el analizador sint\'actico, el valor de $k$
+  y la semilla de una ejecuci\'on.
+
+  Su prop\'osita radica en la organizaci\'on de los datos de entrada como una sola entidad que
+  abstrae el problema y sirve como entrada a la heur\'istica.
+
+  \subsection{El \'arbol}
+  La clase \texttt{tree} abstrae la idea de la creaci\'on de un \'arbol a partir de un conjunto
+  de puntos, donde la trayectoria se crea a partir del algoritmo de Kruskal.
+
+  \section{Algoritmo del Artillero Innovador}
+  Esta clase reune los par\'ametros necesarios para la ejecuci\'on del algoritmo del artillero
+  innovador (los \'angulos de correcci\'on y el par\'ametro $\varepsilon$, encargado de fungir
+  como cota que determina el final del algoritmo), adem\'as, recibe el problema \texttt{kmst}
+  como par\'ametro; la ejecuci\'on del alforitmo se reduce a solo una invocaci\'on de una
+  funci\'on.
+
+  \subsection{Círculo}
+  La clase \texttt{circle} abstrae un c\'irculo en el plano cartesiano que proporciona
+  comportamiento como la devoluci\'on de los puntos que yacen dentro del mismo o
+  la creaci\'on de su cuadrado circunscrito.
+
+  \subsection{Cuadrado}
+  La clase \texttt{square} proporciona comportamiento para encontrar la cantidad de puntos
+  contenidos en \'el, as\'i como la lista de ellos o la computaci\'on de las celdas en las
+  que se puede dividir el mismo.
+
+  \chapter{Implementaci\'on}
+  La orientaci\'on a objetos se ha simulado a partir de la asociaci\'on de funciones, en
+  conjunto con una estructura que es par\'ametro de la primera; esta abstracci\'on permite,
+  al menos de manera primitiva, simular una orientiaci\'on a objetos b\'asica que facilita
+  el proceso creativo y de depuraci\'on del programa.
+
+  \section{Generador de n\'umeros pseudoaleatorios}
+
+  Dado que~\cite{rand_r} describe a la funci\'on \texttt{rand\_r} como un \textit{generador de
+    n\'umeros pseudoaleatorios d\'ebil}, ya que la semilla que recibe es del tipo
+  \texttt{unsigned int} (esta proporciona una cantidad reducida de simulaciones
+  diferentes), he decidido usar \texttt{drand48\_r} y \texttt{lrand48\_r}, los cuales trabajan
+  una semila de tipo \texttt{long int} (que, por lo tanto, induce una mayor cantidad de estados
+  posibles). Ambas se encuentran disponibles dentro de la biblioteca \texttt{stdlib.h}.
+
+  \section{Adaptaci\'on}
+  Como se mencion\'o en la descripci\'on de la heur\'istica, el algoritmo del artillero innovador
+  fue dise\~nado en t\'erminos de la optimizaci\'on de una un problema que puede reducirse
+  a la minimizaci\'on de una funci\'on lineal (funci\'on objetivo) a partir de la modificaci\'on
+  \textit{aleatoria} \footnote{No se trata de un proceso totalmente aleatorio, t\'ecnicamente, el hecho de
+    simular un fen\'omeno act\'ua como gu\'ia y permite un poco m\'as de control y toer\'ia en su
+    ejecuci\'on y dise\~no.} de las variables de las que depende la funci\'on.
+
+  Inicialmente, la conceb\'i como la minimizaci\'on del la suma de las aristas contenidas en el
+  \'arbol (una funci\'on lineal intuitiva, pero err\'onea), pero esta carec\'ia de una variable
+  libre que pudiera modificar con los factores multiplicativos que permitiera, adem\'as, llegar
+  a una mejor\'ia sin modificar la intenci\'on original de los autores; no era posible usar las
+  aristas (o coordenadas de los v\'ertices) como valor modificado ya que los puntos resiultantes
+  podr\'ian no encontrarse dentro de la gr\'afica original; considero, incluso, que, dejando a
+  un lado este problema, resolvi\'endolo, digamos, con una funci\'on que asegure que los puntos
+  resultantes se trat\'asen de solo aquellos contenidos en la gr\'afica, la intenci\'on de los
+  autores (y, por lo tanto, la experimentaci\'on que se llev\'o a cabo para llegar a tales
+  conclusiones) quedar\'ia apartada. Es por ello que decid\'i implementar un algoritmo que
+  involucrara las ideas expuestas en ~\cite{ravi}.
+
+  En este art\'iculo se se abstrae la resoluci\'on del problema como un conjunto contenido en el
+  plano cartesiano. Presenta un algoritmo que pretende aproximar soluciones formando figuras geom\'etricas
+  que abarquen al menos una cantidad \textit{k} de puntos, y, con ellos, formar un \'arbol generador
+  de peso m\'inimo. Esta idea funciona por el simple hecho de tratar de juntar en un \'arbol aquellas zonas
+  m\'as densas de la gr\'afica, es decir, con menor distancia entre sus puntos.
+
+  Es aqu\'i donde me surgi\'o la idea de definir la variable que reducir\'ia mi funci\'on objetivo como
+  el di\'ametro de un c\'irculo que crecer\'ia o disminuir\'ia seg\'un un proceso iterativo ya definido.
+  Entonces el di\'ametro ser\'ia la variable que ser\'ia expuesta a la modificaci\'on de los dos factores
+  multiplicativos descritos por la heur\'istica. Pero, eventualemente, me dar\'ia cuenta de un problema
+  primordial: la b\'usqueda local hab\'ia sido ignorada; el concepto de vecinos no tiene tanto sentido
+  al concebir como unidad fundamental y de cambio las medidas de una figura geom\'etrica; la heur\'istica
+  tornaba m\'as en un algoritmo de b\'usqueda global.
+
+  \section{Problemas}
+  C tiene como principio fundamental la libertad de operaci\'on del programador; solo el
+  compilador "gu\'ia" de cierta manera (sint\'acticamente, al menos), pero todas las
+  vicisitudes son cargadas a la experiencia y creatividad del programador.
+
+  Solo considero relevante destacar la problem\'atica que involucra tres alternativas, ninguna
+  de las cuales, me parece clara de seguir.
+
+  \subsection{Encapsulamiento}
+  El encapsulamiento es un concepto clave en la orientaci\'on a objetos. En C, puede simularse
+  si no se incluye la definic\'on de la estructura dentro del encabezado de la clase. De esta
+  manera, la clase tendr\'a que proporcionar el comportamiento que permita crear objetos instancia
+  de la misma, ya que el operador \texttt{sizeof} (usado al crear din\'anicamente un objeto)
+  no posee la informaci\'on del tama\~no de la estructura. En caso de necesitar estructuras
+  compuestas con estos objetos (como arreglos), ser\'a necesario crear apuntadores a apuntadores
+  de esos objetos, de esta manera se podr\'a guardar un objeto de esa clase invocando
+  su funci\'on constructora, adem\'as, ser\'a posible recorrer el arreglo ya que no se debe
+  conocer el tama\~no de la estructura para hacerlo, sino solo el de un apuntador (ya estandarizado
+  en el lenguaje).
+
+  Puede parecer un poco rebuscada esta soluci\'on ya que implica bastantes niveles de referencias;
+  pero seguimos cumpliendo el encapsulamiento de las clases.
+
+  Por otro lado, se pueden usar arreglos convencionales (como un apuntador al tipo de esa clase),
+  pero se deber\'a proporcionar comportamiento para recorrerlo, modificarlo y acceder a sus datos.
+  Lo que resulta en una tarea muy tediosa, dadas las funciones requeridas.
+
+  Por \'ultimo, trat\'andose tal vez de la alternativa menos tediosa, se encuentra la inclusi\'on
+  de la definici\'on de la estructura dentro del encabezado de la clase. Esta t\'ecnica no sigue
+  los patrones de orientaci\'on a objetos, ya que ahora ser\'a posible crear, con la funci\'on
+  \texttt{malloc} objetos de la clase, sin necesidad de contar con una funci\'on constructora;
+  los atributos de la clase, ya no ser\'an privados; en general, se perder\'a la modularizaci\'on
+  y el encapsulamiento del paradigma orientado a objetos.
+
+  \chapter{Experimentaci\'on}
+  Dada la t\'ecnica de b\'usqueda de la heur\'istica (evitando por completo las b\'usquedas locales),
+  la prueba de su efectividad no ha sido del todo certera, esto yace de la naturaleza de los ejemplos
+  artificiales que, la mayor parte del tiempo, suelen agrupar el \'arbol generador de peso m\'inimo
+  en un lugar apartado de los dem\'as puntos contenidos. Dado que mi implementaci\'on genera
+  c\'irculos y que estos pueden abarcar enteramente esta secci\'on excluida, algunas veces se daba
+  el caso en el que el c\'irculo abarcaba completa y \'unicamente los puntos que pose\'ian el
+  \'arbol de peso m\'inimo.
+
+  Sin embargo, esos solo han sido pocos ejemplos que no eval\'una en gran medida su desemepe\~no.
+
+  \chapter{Conclusiones}
+  Considero que esta implementaci\'on no se ha acercado a la concepci\'on que pose\'ian los autores
+  del algoritmo del artillero innovador. No posee varias caracter\'isticas fundamentales como el
+  uso de semillas o la b\'usqueda local.
+
+  Definitivamente, el tiempo invertido no ha sido el adecuado para integrar, de manera correcta,
+  el problema y la heur\'istica.
+
+
+
+
+  \bibliography{ref}{}
+  \bibliographystyle{plain}
+\end{document}

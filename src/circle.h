@@ -42,11 +42,27 @@ void circle_free(Circle* circle);
 void circle_set_radius(Circle* circle, double radius);
 
 /**
+ * Sets the number of points contained
+ * within the circle.
+ * @param circle the circle.
+ * @param points the number of points.
+ */
+void circle_set_n(Circle* circle, int points);
+
+/**
  * Returns the radius of the circle.
  * @param circle the circle.
  * @return the radius.
  */
 double circle_radius(Circle* circle);
+
+/**
+ * Returns the number of points contained
+ * within the circle.
+ * @param circle the circle.
+ * @return the number of points.
+ */
+int circle_n(Circle* circle);
 
 /**
  * Tells whether the point is or not
@@ -65,11 +81,13 @@ int circle_in(Circle* circle, Point* point);
  * @param n the original number of points.
  * @return the number of points.
  */
-int circle_points(Circle* circle, Point** points, int n);
+int circle_n_points(Circle* circle, Point** points, int n);
 
 /**
- * Returns the circumscribing square of the circle.
- * @param circle circle the circle.
- * @return the circumscribing square.
+ * Returns the points that are inside of the circle.
+ * @param circle the circle.
+ * @param points the points.
+ * @param n the number of points.
+ * @return the points that are within the circle.
  */
-Square* circumscribing_square(Circle* circle);
+Point** circle_points(Circle* circle, Point** points, int n);

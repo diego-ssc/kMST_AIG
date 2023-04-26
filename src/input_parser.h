@@ -40,3 +40,10 @@ void input_parser_free(Input_parser* parser);
  * @return the pointa array.
  */
 Point** parse(Input_parser* parser);
+
+/**
+ * Returns the number of points.
+ * @param parser the input parser.
+ * @return the number of points.
+ */
+int parser_n(Input_parser* parser);

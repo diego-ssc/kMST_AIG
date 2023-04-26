@@ -65,6 +65,13 @@ int kmst_point_n(kMST* kmst);
 int kmst_k(kMST* kmst);
 
 /**
+ * Sets the best solution.
+ * @param kmst the problem instance.
+ * @param tree the tree.
+ */
+void kmst_set_tree(kMST* kmst, Tree* tree);
+
+/**
  * Returns the RNG buffer of the problem.
  * @param kmst the problem instance.
  * @return the buffer.

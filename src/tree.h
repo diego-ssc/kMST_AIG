@@ -1,4 +1,4 @@
-        /*
+/*
  * This file is part of kMST_AIG.
  *
  * Copyright © 2023 Diego Sebastián Sánchez Correa
@@ -21,24 +21,6 @@
 
 #include <stdlib.h>
 
-/* The Point wrapper structure. */
-typedef struct {
-  /* The point. */
-  Point* point;
-  /* The identifier. */
-  int id;
-} Point_Kruskal;
-
-/* The Edge structure. */
-typedef struct {
-  /* The first point. */
-  Point_Kruskal *p;
-  /* The second point. */
-  Point_Kruskal *q;
-  /* The weight. */
-  double w;
-} Edge;
-
 /**
  * Creates a new Tree.
  * @param points the points.
@@ -52,4 +34,23 @@ Tree* tree_new(Point** points, int k);
  */
 void tree_free(Tree* tree);
 
-Edge* kruskal(Point** points, int n);
+/**
+ * Computes the Kruskal algorithm.
+ * @param tree the tree.
+ * @return the resultant edge array.
+ */
+Edge* kruskal(Tree* tree);
+
+/**
+ * Returns the size of the span.
+ * @param tree the tree.
+ * @return the size of the span.
+ */
+int tree_span_size(Tree* tree);
+
+/**
+ * Returns a copy of the tree.
+ * @param tree the tree.
+ * @return the copy.
+ */
+Tree* tree_copy(Tree* tree);

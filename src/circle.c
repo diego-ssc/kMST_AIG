@@ -25,6 +25,8 @@ struct _Circle {
   double radius;
   /* The middle point. */
   Point* m_point;
+  /* The number of points inside of the circle. */
+  int points;
 };
 
 /* Creates a new Circle */
@@ -51,9 +53,21 @@ void circle_set_radius(Circle* circle, double radius) {
   circle->radius = radius;
 }
 
+/* Sets the number of points contained
+   within the circle. */
+void circle_set_n(Circle* circle, int points) {
+  circle->points = points;
+}
+
 /* Returns the radius of the circle. */
 double circle_radius(Circle* circle) {
   return circle->radius;
+}
+
+/* Returns the number of points contained
+   within the circle. */
+int circle_n(Circle* circle) {
+  return circle->points;
 }
 
 /* Tells whether the points is or not
@@ -64,7 +78,7 @@ int circle_in(Circle* circle, Point* point) {
 }
 
 /* Counts the points contained in the circle. */
-int circle_points(Circle* circle, Point** points, int n) {
+int circle_n_points(Circle* circle, Point** points, int n) {
   int i, c = 0;
   for (i = 0; i <  n; ++i)
     if (circle_in(circle, *(points + i)))
@@ -72,16 +86,12 @@ int circle_points(Circle* circle, Point** points, int n) {
   return c;
 }
 
-/* Returns the circumscribing square of the circle. */
-Square* circumscribing_square(Circle* circle) {
-  Point* p = circle->m_point;
-  double r = circle->radius;
-  
-  Point* a = point_new(point_x(p) + r, point_y(p) + r);
-  Point* b = point_new(point_x(p) - r, point_y(p) - r);
-  Square* s = square_new(a, b);
-  free(a);
-  free(b);
-
-  return s;
+/* Returns the points that are inside of the circle. */
+Point** circle_points(Circle* circle, Point** points, int n) {
+  int i;
+  Point** p = malloc(sizeof(Point*)*circle->points);
+  for (i = 0; i <  circle->points; ++i)
+    if (circle_in(circle, *(points + i)))
+      *(p + i) = point_copy(*(points + i));
+  return p;
 }

@@ -28,12 +28,17 @@ struct _Point {
   double x;
   /* The y coordinate. */
   double y;
+  /* The string representation. */
+  char* str;
 };
 
 /* Creates a new Point. */
 Point* point_new(double x, double y) {
   /* Heap allocation. */
   Point* point = malloc(sizeof(struct _Point));
+  point->str = malloc((sizeof(char)*4) +
+                      (sizeof(double)*2) + 1);
+
   /* Value copy. */
   point->x = x;
   point->y = y;
@@ -43,6 +48,8 @@ Point* point_new(double x, double y) {
 
 /* Frees the memory used by the Point. */
 void point_free(Point* point) {
+  if (point->str)
+    free(point->str);
   free(point);
 }
 
@@ -95,10 +102,20 @@ Point* middle_point(Point* p_1, Point* p_2) {
 Point* point_copy(Point* point) {
   /* Heap allocation. */
   Point* p = malloc(sizeof(struct _Point));
+  p->str = malloc((sizeof(char)*4) +
+                  (sizeof(double)*2) + 1);
 
   /* Value copy. */
   p->x = point->x;
   p->y = point->y;
 
   return p;
+}
+
+/* Returns the string representation of a point. */
+char* point_to_string(Point* point) {
+  char* str = point->str;
+  sprintf(str, "(%.2f, %.2f)", point->x,
+          point->y);
+  return str;
 }

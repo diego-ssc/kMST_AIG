@@ -95,3 +95,10 @@ Point* middle_point(Point* p_1, Point* p_2);
  * @return the copied point.
  */
 Point* point_copy(Point* point);
+
+/**
+ * Returns the string representation of a point.
+ * @param point the point.
+ * @return the string representation of the point.
+ */
+char* point_to_string(Point* point);
