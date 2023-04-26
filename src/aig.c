@@ -100,7 +100,7 @@ void aig_heuristic(AIG* aig) {
   for (i = 0; i < kmst_point_n(aig->kmst); ++i) {
     for (j = i+1; j < kmst_point_n(aig->kmst); ++j) {
       /* Computing the generated circle. */
-      c = aig_circle(aig, 1, 4);
+      c = aig_circle(aig, i, j);
 
       /* Setting the new attributes. */
       circle_set_radius(c, circle_radius(c)*sqrt(3));
@@ -110,17 +110,21 @@ void aig_heuristic(AIG* aig) {
 
       circle_set_n(c, n);
 
-      if (n < k)
+      if (n < k) {
+        circle_free(c);
         continue;
+      }
+
       max = MAX_ITERATIONS;
       while ((circle_n(c) >= k) && max--) {
+        n = circle_n_points(c, points, p_n);
+        circle_set_n(c, n);
         c_points = circle_points(c, points, p_n);
 
         tree = tree_new(c_points, k);
 
         span_1 = kruskal(tree);
         new_eval = eval_edge_array(span_1, k - 1);
-
         if (new_eval < old_eval) {
           old_eval = new_eval;
           if (best)
@@ -131,8 +135,6 @@ void aig_heuristic(AIG* aig) {
           tree_free(tree);
 
         free_point_array(&c_points, circle_n(c));
-        n = circle_n_points(c, points, p_n);
-        circle_set_n(c, n);
         circle_set_radius(c, circle_radius(c)*acos(aig->a_max)*acos(aig->b_max));
 
         free(span_1);
@@ -141,5 +143,6 @@ void aig_heuristic(AIG* aig) {
       circle_free(c);
     }
   }
+
   kmst_set_tree(aig->kmst, best);
 }

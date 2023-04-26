@@ -291,10 +291,11 @@ La selecci\'on de los factores multiplicativos (descritos como una f\'ormula apl
   Es aqu\'i donde me surgi\'o la idea de definir la variable que reducir\'ia mi funci\'on objetivo como
   el di\'ametro de un c\'irculo que crecer\'ia o disminuir\'ia seg\'un un proceso iterativo ya definido.
   Entonces el di\'ametro ser\'ia la variable que ser\'ia expuesta a la modificaci\'on de los dos factores
-  multiplicativos descritos por la heur\'istica. Pero, eventualemente, me dar\'ia cuenta de un problema
+  multiplicativos descritos por la heur\'istica. Pero, eventualmente, me dar\'ia cuenta de un problema
   primordial: la b\'usqueda local hab\'ia sido ignorada; el concepto de vecinos no tiene tanto sentido
   al concebir como unidad fundamental y de cambio las medidas de una figura geom\'etrica; la heur\'istica
-  tornaba m\'as en un algoritmo de b\'usqueda global.
+  tornaba m\'as en un algoritmo de b\'usqueda global. Y dado que ya hab\'ia definido la modificaci\'on del
+  di\'ametro del c\'irculo, no restaba proceso aleatorio que pudiera obtener una semilla como par\'ametro.
 
   \section{Problemas}
   C tiene como principio fundamental la libertad de operaci\'on del programador; solo el

@@ -20,23 +20,49 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 
 #include "heuristic.h"
 
 /* Prints the execution intructions of the program. */
 static void usage() {
-  fprintf(stderr, "Usage:\n\t./kMST_AIG [aig-parameters]"
-          " [input file] [options]\n\n");
+  fprintf(stderr, "Usage:\n\t./kMST_AIG"
+          " -f [input file] [options]\n\n");
+  fprintf(stderr, "Options:\n"
+          "\t-k\n\t\tthe size of minimum spanning tree\n");
   exit(1);
 }
 
-/* Executes the main thread of the program. */
-int main(int argc, char** argv) {
-  if (argc == 1)
+/* Parses the arguments passed to the program. */
+void parse_arguments(int argc, char** argv) {
+  if (argc < 3)
     usage();
-  
-  Input_parser* parser = input_parser_new(*(argv+1));
-  kMST* kmst = kmst_new(parse(parser), 10, parser_n(parser), 584);
+  int k = 0, f = 0;
+  char c, n[100];
+  while (--argc > 0)
+    if ((*++argv)[0] == '-')
+      while ((c = *++argv[0]))
+        switch (c) {
+        case 'k':
+          k = argc - 1 ? atof(*(argv + 1)) : k;
+          break;
+        case 'f':
+          if (argc - 1)
+            strcpy(n, *(argv + 1));
+          f++;
+          break;
+        default:
+          fprintf(stderr, "kMST: illegal option %c\n", c);
+          argc = 0;
+          break;
+        }
+
+  if (!k)
+    k = 10;
+  if (!f)
+    usage();
+  Input_parser* parser = input_parser_new(n);
+  kMST* kmst = kmst_new(parse(parser), k, parser_n(parser), 584);
   AIG* aig = aig_new(kmst, 0.2, 0.2, 100000);
   aig_heuristic(aig);
 
@@ -51,10 +77,15 @@ int main(int argc, char** argv) {
            edge_w(edge_array_position(span, i)));
   }
   printf("Cost: %f\n", w);
+
   free(span);
-  
+
   aig_free(aig);
   input_parser_free(parser);
+}
 
+/* Executes the main thread of the program. */
+int main(int argc, char** argv) {
+  parse_arguments(argc, argv);
   return 0;
 }

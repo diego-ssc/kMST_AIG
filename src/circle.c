@@ -88,10 +88,13 @@ int circle_n_points(Circle* circle, Point** points, int n) {
 
 /* Returns the points that are inside of the circle. */
 Point** circle_points(Circle* circle, Point** points, int n) {
-  int i;
-  Point** p = malloc(sizeof(Point*)*circle->points);
-  for (i = 0; i <  circle->points; ++i)
-    if (circle_in(circle, *(points + i)))
-      *(p + i) = point_copy(*(points + i));
+  int i, j = 0;
+  Point** p = calloc(1,sizeof(Point*)*circle->points);
+  for (i = 0; i <  n; ++i)
+    if (circle_in(circle, *(points + i))) {
+      *(p + j) = point_copy(*(points + i));
+      j++;
+    }
+
   return p;
 }
