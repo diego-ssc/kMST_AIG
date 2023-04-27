@@ -19,6 +19,8 @@
 
 #include "heuristic.h"
 
+#include <stdio.h>
+
 struct _Input_parser {
   /* The file pointer. */
   FILE* fp;
@@ -39,6 +41,10 @@ Input_parser* input_parser_new(char* fn) {
   /* File opening. */
   parser->fp = fopen(fn, "r");
 
+  if (!parser->fp) {
+    fprintf(stderr, "kMST:\tCould not open file: %s\n", fn);
+    exit(1);
+  }
   /* Heap initialization. */
   parser->n = point_counter(parser);
   fclose(parser->fp);
@@ -64,6 +70,7 @@ Point** parse(Input_parser* parser) {
     *(parser->points + i) = point_new(x, y);
     ++i;
   }
+  
   return parser->points;
 }
 

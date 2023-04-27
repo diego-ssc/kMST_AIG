@@ -44,7 +44,7 @@ static double heuristic_function(double);
 
 /* Creates a new Algorithm of the Innovative Gunner Heuristic. */
 AIG* aig_new(kMST* kmst, double a_max, double b_max,
-             int epsilon, int max_iterations) {
+             int epsilon) {
   /* Heap allocation. */
   AIG* aig = malloc(sizeof(struct _AIG));
 
@@ -52,8 +52,7 @@ AIG* aig_new(kMST* kmst, double a_max, double b_max,
   aig->kmst           = kmst;
   aig->a_max          = a_max ? a_max : A_MAX;
   aig->b_max          = b_max ? b_max : B_MAX;
-  aig->max_iterations = max_iterations ? max_iterations : MAX_ITERATIONS;
-  aig->epsilon  = epsilon;
+  aig->epsilon        = epsilon ? epsilon : MAX_ITERATIONS;
 
   return aig;
 }
@@ -111,7 +110,7 @@ void aig_heuristic(AIG* aig) {
   Edge* span_1 = 0;
   double new_eval;
   double old_eval = 100000;
-  int max = aig->max_iterations;
+  int max = aig->epsilon;
 
   for (i = 0; i < kmst_point_n(aig->kmst); ++i) {
     for (j = i+1; j < kmst_point_n(aig->kmst); ++j) {
@@ -131,7 +130,7 @@ void aig_heuristic(AIG* aig) {
         continue;
       }
 
-      max = aig->max_iterations;
+      max = aig->epsilon;
       while ((circle_n(c) >= k) && max--) {
         c_points = circle_points(c, points, p_n);
 

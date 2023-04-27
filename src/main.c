@@ -89,7 +89,7 @@ void parse_arguments(int argc, char** argv) {
   if (y < 0.5)
     b *= -1;
   
-  AIG* aig = aig_new(kmst, a, a, 100000, m);
+  AIG* aig = aig_new(kmst, a, a, m);
   aig_heuristic(aig);
 
   Edge* span = kruskal(kmst_tree(kmst));

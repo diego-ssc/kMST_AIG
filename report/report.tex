@@ -191,8 +191,14 @@ La selecci\'on de los factores multiplicativos (descritos como una f\'ormula apl
 
   \chapter{Dise\~no}
   El dise\~no sigui\'o una estructura orientada a objetos, dentro de los l\'imites de la
-  abastracci\'on proporcionada por C(conceptos como herencia o polimorfismo son inexistentes
+  abstracci\'on proporcionada por C(conceptos como herencia o polimorfismo son inexistentes
   sin una implementaci\'on previa).
+
+  El contar con una heur\'istica enfocada en la optimizaci\'on de una funci\'on lineal,
+  requiri\'o de una adaptaci\'on radical que estuviera en t\'erminos geom\'etricos.
+  Las decisiones tomadas fueron hechas tal que la implementaci\'on tomada no se encuentra
+  muy alejada de la concepci\'on original de los autores del AIG (Algorithm of the Innovative
+  Gunner).
 
   \section{Analizador Sint\'actico}
   Este objeto se encarga de proveer los datos de entrada a partir de un archivo con el formato
@@ -210,42 +216,99 @@ La selecci\'on de los factores multiplicativos (descritos como una f\'ormula apl
   puntos antes de asignar el espacio en el heap para la creaci\'on del arreglo de puntos.
   Puede pensarse que no ha sido la mejor decisi\'on, haciendo notar que la primera iteraci\'on
   ser\'ia innecesaria si se usaran listas; pero consider\'e m\'as importante el acceso en tiempo
-  constante que el aumento en uno de un proceso lineal (que, dado que son procesos constantes
-  lineales, sigue siendo, en general, un proceso lineal).
+  constante que el aumento en uno de un proceso lineal (que, dado que son dos procesos
+  lineales, sigue perteneciendo a la complejidad lineal).
 
   \subsection{Puntos}
-  Los puntos se abstrayeron en una clase \texttt{point} que, adem\'as, de proveer las coordenadas
+  Los puntos se abstrayeron en una clase \texttt{point} que adem\'as de proveer las coordenadas
   \textit{x} y \textit{y} en una sola estructura, proporciona comportamiento como el c\'alculo
   de la distancia euclidiana o el punto medio. Se trata de la estrucura esencial del programa.
 
   \section{El problema}
-  El problema del k - \'arbol generador de peso m\'inimo se abstrajo en una clase \texttt{kmst},
+  El problema del k - \'arbol generador de peso m\'inimo se abstrajo en una clase \texttt{kmst}
   cuya funci\'on es recibir los puntos obtenidos por el analizador sint\'actico, el valor de $k$
   y la semilla de una ejecuci\'on.
 
-  Su prop\'osita radica en la organizaci\'on de los datos de entrada como una sola entidad que
+  Su prop\'osito radica en la organizaci\'on de los datos de entrada como una sola entidad que
   abstrae el problema y sirve como entrada a la heur\'istica.
 
   \subsection{El \'arbol}
   La clase \texttt{tree} abstrae la idea de la creaci\'on de un \'arbol a partir de un conjunto
   de puntos, donde la trayectoria se crea a partir del algoritmo de Kruskal.
+  \footnote{El algoritmo de Kruskal fue preferido sobre el algoritmo de Prim, ya que este
+    tiene una complejidad de menor ($O(E \ log \ V)$, sobre $O(V^2)$); excluyendo las
+    implementaciones que involucran mont\'iculos de Fibonacci}
 
   \section{Algoritmo del Artillero Innovador}
   Esta clase reune los par\'ametros necesarios para la ejecuci\'on del algoritmo del artillero
   innovador (los \'angulos de correcci\'on y el par\'ametro $\varepsilon$, encargado de fungir
   como cota que determina el final del algoritmo), adem\'as, recibe el problema \texttt{kmst}
-  como par\'ametro; la ejecuci\'on del alforitmo se reduce a solo una invocaci\'on de una
+  como par\'ametro; la ejecuci\'on del algoritmo se reduce a solo una invocaci\'on de una
   funci\'on.
+
+  Como se describi\'o en la secci\'on que describe la heur\'istica, el algoritmo del artillero innovador
+  fue dise\~nado en t\'erminos de la optimizaci\'on de una un problema que puede reducirse
+  a la minimizaci\'on de una funci\'on lineal (funci\'on objetivo) a partir de la modificaci\'on
+  \textit{aleatoria} \footnote{No se trata de un proceso totalmente aleatorio, t\'ecnicamente, el hecho de
+    simular un fen\'omeno act\'ua como gu\'ia y permite un poco m\'as de control y toer\'ia en su
+    ejecuci\'on y dise\~no.} de las variables de las que depende la funci\'on;
+  no se provee la informaci\'on suficiente para la adaptaci\'on a problemas
+  m\'as generales, as\'i que el problema radicaba en proponer un dise\~no que estuviera
+  en t\'erminos del problema, adem\'as de seguir la concepci\'on original de los autores
+  (usar la heur\'istica acorde a como fue dise\~nada, para aprovechar la experimentaci\'on
+  realizada durante su creaci\'on).
+
+
+  \subsection{Adaptaci\'on}
+  Inicialmente, conceb\'i el problema como la minimizaci\'on de la suma de las aristas contenidas en el
+  \'arbol (una funci\'on lineal intuitiva, pero err\'onea), pero esta carec\'ia de una variable
+  libre que pudiera modificar con los factores multiplicativos que permitiera, adem\'as, llegar
+  a una mejor\'ia sin modificar la intenci\'on original de los autores; no era posible usar las
+  aristas (o coordenadas de los v\'ertices) como valor modificado, ya que los puntos resultantes
+  podr\'ian no encontrarse dentro de la gr\'afica original; considero, incluso, que, dejando a
+  un lado este problema, resolvi\'endolo, digamos, con una funci\'on que asegure que los puntos
+  resultantes se trat\'asen de solo aquellos contenidos en la gr\'afica, la intenci\'on de los
+  autores (y, por lo tanto, la experimentaci\'on que se llev\'o a cabo para llegar a tales
+  conclusiones) quedar\'ia apartada. Es por ello que decid\'i implementar un algoritmo que
+  involucrara las ideas expuestas en ~\cite{ravi}.
+
+  En este art\'iculo se se abstrae la resoluci\'on del problema como un conjunto de puntos contenidos en el
+  plano cartesiano. Presenta un algoritmo que pretende aproximar soluciones formando figuras geom\'etricas
+  que abarquen al menos una cantidad \textit{k} de puntos, y, con ellos, formar un \'arbol generador
+  de peso m\'inimo. Esta idea funciona por el simple hecho de tratar de juntar en un \'arbol aquellas zonas
+  m\'as densas de la gr\'afica, es decir, con menor distancia entre sus puntos para despu\'es tomar
+  una cantidad \textit{k} de ellos para armar un \'arbol generador de peso m\'inimo.
+
+  Es aqu\'i donde me surgi\'o la idea de definir la variable que reducir\'ia mi funci\'on objetivo como
+  el di\'ametro de un c\'irculo que crecer\'ia o disminuir\'ia seg\'un un proceso iterativo ya definido.
+  Entonces esta ser\'ia la variable que ser\'ia expuesta a la modificaci\'on de los dos factores
+  multiplicativos descritos por la heur\'istica. Pero, eventualmente, me dar\'ia cuenta de un problema
+  primordial: la b\'usqueda local hab\'ia sido ignorada; el concepto de vecinos no tiene tanto sentido
+  al concebir como unidad fundamental y de cambio las medidas de una figura geom\'etrica; la heur\'istica
+  se tornaba m\'as en un algoritmo de b\'usqueda global. Esto pareci\'o ser un gran problema:
+  no podr\'ia \textit{barrer}\footnote{La t\'ecnia del barrido tiene como prop\'osito la obtenci\'on
+    de m\'inimos locales, dada una soluci\'on; se suele implementar calculando todos los vecinos de
+    la soluci\'on actual y estableciendo como mejor soluci\'on a aquella que se eval\'ua con un peso
+    m\'as reducido en comparaci\'on.} una soluci\'on, sin embargo, pod\'ia explorar en gran medida
+  la instancia del problema.
+
+  Es por ello que centr\'e mi enfoque en la b\'usqueda global (sin dejar completamente de lado un
+  poco la b\'usqueda local), ya que no era posible tener una b\'usqueda minuciosa, decid\'i explotar
+  en gran medida la b\'usqueda global creando todos los posibles  c\'irculos de di\'ametro variable,
+  pero que depend\'ia inicialmente de dos puntos seleccionados aleatoriamente (teniendo como punto
+  central, el punto medio entre estos), es decir, un c\'irculo para cada par de puntos contenidos
+  en la gr\'afica.
 
   \subsection{Círculo}
   La clase \texttt{circle} abstrae un c\'irculo en el plano cartesiano que proporciona
-  comportamiento como la devoluci\'on de los puntos que yacen dentro del mismo o
-  la creaci\'on de su cuadrado circunscrito.
+  comportamiento como la devoluci\'on de los puntos.
 
-  \subsection{Cuadrado}
-  La clase \texttt{square} proporciona comportamiento para encontrar la cantidad de puntos
-  contenidos en \'el, as\'i como la lista de ellos o la computaci\'on de las celdas en las
-  que se puede dividir el mismo.
+  Este es la estructura esencial de la exploraci\'on (global y local) del algoritmo, su radio ser\'a
+  el par\'ametro cambiante que busca explorar (no necesariamente de manera progresiva
+  \footnote{El radio del c\'irculo no cambiar\'a con base en la calidad de las soluciones,
+    solo hasta que este siga conteniendo al menos una cantidad de k puntos o llegue al
+    m\'aximo n\'umero de iteraciones definido para este proceso.}) la gr\'afica en busca de
+  conjuntos de puntos que formen el \'arbol generado de peso m\'inimo.
 
   \chapter{Implementaci\'on}
   La orientaci\'on a objetos se ha simulado a partir de la asociaci\'on de funciones, en
@@ -262,41 +325,6 @@ La selecci\'on de los factores multiplicativos (descritos como una f\'ormula apl
   una semila de tipo \texttt{long int} (que, por lo tanto, induce una mayor cantidad de estados
   posibles). Ambas se encuentran disponibles dentro de la biblioteca \texttt{stdlib.h}.
 
-  \section{Adaptaci\'on}
-  Como se mencion\'o en la descripci\'on de la heur\'istica, el algoritmo del artillero innovador
-  fue dise\~nado en t\'erminos de la optimizaci\'on de una un problema que puede reducirse
-  a la minimizaci\'on de una funci\'on lineal (funci\'on objetivo) a partir de la modificaci\'on
-  \textit{aleatoria} \footnote{No se trata de un proceso totalmente aleatorio, t\'ecnicamente, el hecho de
-    simular un fen\'omeno act\'ua como gu\'ia y permite un poco m\'as de control y toer\'ia en su
-    ejecuci\'on y dise\~no.} de las variables de las que depende la funci\'on.
-
-  Inicialmente, la conceb\'i como la minimizaci\'on del la suma de las aristas contenidas en el
-  \'arbol (una funci\'on lineal intuitiva, pero err\'onea), pero esta carec\'ia de una variable
-  libre que pudiera modificar con los factores multiplicativos que permitiera, adem\'as, llegar
-  a una mejor\'ia sin modificar la intenci\'on original de los autores; no era posible usar las
-  aristas (o coordenadas de los v\'ertices) como valor modificado ya que los puntos resiultantes
-  podr\'ian no encontrarse dentro de la gr\'afica original; considero, incluso, que, dejando a
-  un lado este problema, resolvi\'endolo, digamos, con una funci\'on que asegure que los puntos
-  resultantes se trat\'asen de solo aquellos contenidos en la gr\'afica, la intenci\'on de los
-  autores (y, por lo tanto, la experimentaci\'on que se llev\'o a cabo para llegar a tales
-  conclusiones) quedar\'ia apartada. Es por ello que decid\'i implementar un algoritmo que
-  involucrara las ideas expuestas en ~\cite{ravi}.
-
-  En este art\'iculo se se abstrae la resoluci\'on del problema como un conjunto contenido en el
-  plano cartesiano. Presenta un algoritmo que pretende aproximar soluciones formando figuras geom\'etricas
-  que abarquen al menos una cantidad \textit{k} de puntos, y, con ellos, formar un \'arbol generador
-  de peso m\'inimo. Esta idea funciona por el simple hecho de tratar de juntar en un \'arbol aquellas zonas
-  m\'as densas de la gr\'afica, es decir, con menor distancia entre sus puntos.
-
-  Es aqu\'i donde me surgi\'o la idea de definir la variable que reducir\'ia mi funci\'on objetivo como
-  el di\'ametro de un c\'irculo que crecer\'ia o disminuir\'ia seg\'un un proceso iterativo ya definido.
-  Entonces el di\'ametro ser\'ia la variable que ser\'ia expuesta a la modificaci\'on de los dos factores
-  multiplicativos descritos por la heur\'istica. Pero, eventualmente, me dar\'ia cuenta de un problema
-  primordial: la b\'usqueda local hab\'ia sido ignorada; el concepto de vecinos no tiene tanto sentido
-  al concebir como unidad fundamental y de cambio las medidas de una figura geom\'etrica; la heur\'istica
-  tornaba m\'as en un algoritmo de b\'usqueda global. Y dado que ya hab\'ia definido la modificaci\'on del
-  di\'ametro del c\'irculo, no restaba proceso aleatorio que pudiera obtener una semilla como par\'ametro.
-
   \section{Problemas}
   C tiene como principio fundamental la libertad de operaci\'on del programador; solo el
   compilador "gu\'ia" de cierta manera (sint\'acticamente, al menos), pero todas las
@@ -308,50 +336,59 @@ La selecci\'on de los factores multiplicativos (descritos como una f\'ormula apl
   \subsection{Encapsulamiento}
   El encapsulamiento es un concepto clave en la orientaci\'on a objetos. En C, puede simularse
   si no se incluye la definic\'on de la estructura dentro del encabezado de la clase. De esta
-  manera, la clase tendr\'a que proporcionar el comportamiento que permita crear objetos instancia
-  de la misma, ya que el operador \texttt{sizeof} (usado al crear din\'anicamente un objeto)
+  manera, la clase tendr\'a que proporcionar el comportamiento que permita crear objetos que sean
+  instancia de la misma, ya que el operador \texttt{sizeof} (usado al crear din\'anicamente un objeto)
   no posee la informaci\'on del tama\~no de la estructura. En caso de necesitar estructuras
   compuestas con estos objetos (como arreglos), ser\'a necesario crear apuntadores a apuntadores
   de esos objetos, de esta manera se podr\'a guardar un objeto de esa clase invocando
   su funci\'on constructora, adem\'as, ser\'a posible recorrer el arreglo ya que no se debe
   conocer el tama\~no de la estructura para hacerlo, sino solo el de un apuntador (ya estandarizado
-  en el lenguaje).
+  en el lenguaje).\\
 
-  Puede parecer un poco rebuscada esta soluci\'on ya que implica bastantes niveles de referencias;
-  pero seguimos cumpliendo el encapsulamiento de las clases.
+  Puede parecer un poco rebuscada esta soluci\'on ya que implica bastantes niveles de abstracci\'on;
+  pero seguimos cumpliendo el encapsulamiento de las clases.\\
 
   Por otro lado, se pueden usar arreglos convencionales (como un apuntador al tipo de esa clase),
   pero se deber\'a proporcionar comportamiento para recorrerlo, modificarlo y acceder a sus datos.
-  Lo que resulta en una tarea muy tediosa, dadas las funciones requeridas.
+  Lo que resulta en una tarea muy tediosa, dadas las funciones requeridas.\\
 
   Por \'ultimo, trat\'andose tal vez de la alternativa menos tediosa, se encuentra la inclusi\'on
   de la definici\'on de la estructura dentro del encabezado de la clase. Esta t\'ecnica no sigue
   los patrones de orientaci\'on a objetos, ya que ahora ser\'a posible crear, con la funci\'on
   \texttt{malloc} objetos de la clase, sin necesidad de contar con una funci\'on constructora;
   los atributos de la clase, ya no ser\'an privados; en general, se perder\'a la modularizaci\'on
-  y el encapsulamiento del paradigma orientado a objetos.
+  y el encapsulamiento del paradigma orientado a objetos.\\
+
+  Durante la implementaci\'on, se usaron las dos primeras (que, considero, son igual de adecudas;
+  aunque prefiero la primero); pero como he declarado, no me fue claro cual sigue un est\'andar
+  o convenci\'on que tenga a favor m\'as ventajas que desventajas.
 
   \chapter{Experimentaci\'on}
-  Dada la t\'ecnica de b\'usqueda de la heur\'istica (evitando por completo las b\'usquedas locales),
-  la prueba de su efectividad no ha sido del todo certera, esto yace de la naturaleza de los ejemplos
-  artificiales que, la mayor parte del tiempo, suelen agrupar el \'arbol generador de peso m\'inimo
-  en un lugar apartado de los dem\'as puntos contenidos. Dado que mi implementaci\'on genera
-  c\'irculos y que estos pueden abarcar enteramente esta secci\'on excluida, algunas veces se daba
-  el caso en el que el c\'irculo abarcaba completa y \'unicamente los puntos que pose\'ian el
-  \'arbol de peso m\'inimo.
+  Tener definida como t\'ecnica principal de optimizaci\'on a la b\'usqueda global ayud\'o en gran
+  medida a la eficiencia general del algoritmo.
 
-  Sin embargo, esos solo han sido pocos ejemplos que no eval\'una en gran medida su desemepe\~no.
+  A pesar de tener que crearse un c\'irculo para cada par de puntos, el algoritmo tiene un tiempo
+  de ejecuci\'on bastante r\'apido ($<$ 1 segundo; cuidando que el n\'umero de iteraciones para
+  la b\'usqueda dentro de un mismo c\'irculo no sea muy elevado) y, adem\'as, dada su naturaleza
+  \textit{greedy} y su gran exploraci\'on, suele encontrar muy r\'apidamente \'arboles generadores
+  de peso m\'inimo con una evaluaci\'on decente. Su naturaleza no permite que caiga en l\'imites
+  locales, adem\'as de evitar, b\'usquedas locales que podr\'ian no llegar a una buena cuenca de
+  soluciones.
 
-  \chapter{Conclusiones}
-  Considero que esta implementaci\'on no se ha acercado a la concepci\'on que pose\'ian los autores
-  del algoritmo del artillero innovador. No posee varias caracter\'isticas fundamentales como el
-  uso de semillas o la b\'usqueda local.
+  Si bien la experimentaci\'on no fue abundante, considero que demostr\'o ser un algoritmo bastante
+  efectivo para la b\'usqueda de \'arboles generadores de peso m\'inimo.
 
-  Definitivamente, el tiempo invertido no ha sido el adecuado para integrar, de manera correcta,
-  el problema y la heur\'istica.
+  \chapter{Conclusiones}                                                     
+  A pesar de pensar, inicialmente, que el algoritmo no desenvolver\'ia muy bien, dada la omisi\'on
+  de la b\'usquedas locales (y, por lo tanto, de t\'ecnicas como el barrido), los resultados
+  lograron sorprenderme. La creaci\'on cuadr\'atica de c\'irculo permiti\'o nunca caer en problemas
+  como no lograr salir de m\'inimos locales, adem\'as, dado que se trataba de una gr\'afica completo,
+  considero, que una b\'usqueda local ser\'ia (en gran parte de los casos) contraproducente ya que
+  cualquier v\'ertice puede ser vecino a otro (no considerando, por supuesto, par\'ametros extra
+  que pudieran optimizar este proceso) y esto ocasionar\'ia un mayor tiempo de ejecuci\'on.\\
 
-
-
+  Los resultados me hacen pensar que la concepci\'on original del AIG fue seguida y que, por lo tanto,
+  su dise\~no  y adaptaci\'on a los t\'erminos del problema han sido los adecuados.
 
   \bibliography{ref}{}
   \bibliographystyle{plain}
