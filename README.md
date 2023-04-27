@@ -3,7 +3,7 @@ k-minimum spanning tree/Algorithm of the Innovative Gunner in C.
 
 # Usage:
 ```
-./kMST_AIG [input file] [options]
+./kMST_AIG -f [input file] [options]
 ```
 # Options:
 ```
