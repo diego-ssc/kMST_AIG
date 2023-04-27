@@ -20,6 +20,8 @@
 #include "heuristic.h"
 
 #define MAX_ITERATIONS 2
+#define A_MAX 0.2
+#define B_MAX 0.2
 
 /* The AIG structure. */
 struct _AIG {
@@ -33,18 +35,24 @@ struct _AIG {
   int epsilon;
   /* The variable to optimize. */
   double diameter;
+  /* The maximum number of iterations. */
+  int max_iterations;
 };
+
+/* Returns the function according to the given correction angle. */
+static double heuristic_function(double);
 
 /* Creates a new Algorithm of the Innovative Gunner Heuristic. */
 AIG* aig_new(kMST* kmst, double a_max, double b_max,
-             int epsilon) {
+             int epsilon, int max_iterations) {
   /* Heap allocation. */
   AIG* aig = malloc(sizeof(struct _AIG));
 
   /* Value copy. */
-  aig->kmst     = kmst;
-  aig->a_max    = a_max;
-  aig->b_max    = b_max;
+  aig->kmst           = kmst;
+  aig->a_max          = a_max ? a_max : A_MAX;
+  aig->b_max          = b_max ? b_max : B_MAX;
+  aig->max_iterations = max_iterations ? max_iterations : MAX_ITERATIONS;
   aig->epsilon  = epsilon;
 
   return aig;
@@ -68,6 +76,14 @@ Circle* aig_circle(AIG* aig, int i, int j) {
   point_free(m);
 
   return c;
+}
+
+/* Returns the function according to the given correction angle. */
+static double heuristic_function(double a) {
+  if (a > 0)
+    return acos(a);
+  else
+    return cos(a);
 }
 
 /* Begins the execution of the heuristic. */
@@ -95,7 +111,7 @@ void aig_heuristic(AIG* aig) {
   Edge* span_1 = 0;
   double new_eval;
   double old_eval = 100000;
-  int max = MAX_ITERATIONS;
+  int max = aig->max_iterations;
 
   for (i = 0; i < kmst_point_n(aig->kmst); ++i) {
     for (j = i+1; j < kmst_point_n(aig->kmst); ++j) {
@@ -115,10 +131,8 @@ void aig_heuristic(AIG* aig) {
         continue;
       }
 
-      max = MAX_ITERATIONS;
+      max = aig->max_iterations;
       while ((circle_n(c) >= k) && max--) {
-        n = circle_n_points(c, points, p_n);
-        circle_set_n(c, n);
         c_points = circle_points(c, points, p_n);
 
         tree = tree_new(c_points, k);
@@ -135,8 +149,11 @@ void aig_heuristic(AIG* aig) {
           tree_free(tree);
 
         free_point_array(&c_points, circle_n(c));
-        circle_set_radius(c, circle_radius(c)*acos(aig->a_max)*acos(aig->b_max));
-
+        circle_set_radius(c, circle_radius(c)*
+                          heuristic_function(aig->a_max)*
+                          heuristic_function(aig->b_max));
+        n = circle_n_points(c, points, p_n);
+        circle_set_n(c, n);
         free(span_1);
       }
 

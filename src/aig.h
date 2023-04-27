@@ -30,7 +30,7 @@
  * @param epsilon the epsilon parameter.
  */
 AIG* aig_new(kMST* kmst, double a_max, double b_max,
-             int epsilon);
+             int epsilon, int max_iterations);
 
 /**
  * Frees the memory used by the Algorithm of the Innovative Gunner.

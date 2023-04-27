@@ -29,7 +29,10 @@ static void usage() {
   fprintf(stderr, "Usage:\n\t./kMST_AIG"
           " -f [input file] [options]\n\n");
   fprintf(stderr, "Options:\n"
-          "\t-k\n\t\tthe size of minimum spanning tree\n");
+          "\t-k\n\t\tthe size of minimum spanning tree\n"
+          "\t-s\n\t\tthe seed\n"
+          "\t-m\n\t\tthe maximum number of iterations\n"
+          "\t\tof the local search\n");
   exit(1);
 }
 
@@ -37,19 +40,26 @@ static void usage() {
 void parse_arguments(int argc, char** argv) {
   if (argc < 3)
     usage();
-  int k = 0, f = 0;
+  int k = 0, f = 0, m = 0;
+  long int seed = 0;
   char c, n[100];
   while (--argc > 0)
     if ((*++argv)[0] == '-')
       while ((c = *++argv[0]))
         switch (c) {
         case 'k':
-          k = argc - 1 ? atof(*(argv + 1)) : k;
+          k = argc - 1 ? atoi(*(argv + 1)) : k;
           break;
         case 'f':
           if (argc - 1)
             strcpy(n, *(argv + 1));
           f++;
+          break;
+        case 's':
+          seed = argc - 1 ? atoi(*(argv + 1)) : seed;
+          break;
+        case 'm':
+          m = argc - 1 ? atoi(*(argv + 1)) : m;
           break;
         default:
           fprintf(stderr, "kMST: illegal option %c\n", c);
@@ -63,7 +73,23 @@ void parse_arguments(int argc, char** argv) {
     usage();
   Input_parser* parser = input_parser_new(n);
   kMST* kmst = kmst_new(parse(parser), k, parser_n(parser), 584);
-  AIG* aig = aig_new(kmst, 0.2, 0.2, 100000);
+
+  
+  double a = 0.;
+  double b = 0.;
+  double x, y;
+  if (seed) {
+    drand48_r(kmst_buffer(kmst), &a);
+    drand48_r(kmst_buffer(kmst), &b);
+  }
+  drand48_r(kmst_buffer(kmst), &x);
+  drand48_r(kmst_buffer(kmst), &y);
+  if (x < 0.5)
+    a *= -1;
+  if (y < 0.5)
+    b *= -1;
+  
+  AIG* aig = aig_new(kmst, a, a, 100000, m);
   aig_heuristic(aig);
 
   Edge* span = kruskal(kmst_tree(kmst));
